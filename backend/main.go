@@ -17,8 +17,6 @@ func handleRoot(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleHealthCheck(w http.ResponseWriter, req *http.Request) {
-  fmt.Println("request to healthcheck came")
-
   w.WriteHeader(http.StatusOK)
   w.Header().Set("Content-Type", "application/text")
 
@@ -40,7 +38,7 @@ func handleRandomNumber(w http.ResponseWriter, req *http.Request) {
 func main() {
   http.HandleFunc("/api/", handleRoot)
   http.HandleFunc("/api/healthcheck", handleHealthCheck)
-  http.HandleFunc("/api/handleHealthCheck", handleHealthCheck)
+  http.HandleFunc("/api/random-number", handleRandomNumber)
 
   fmt.Println("starting the server")
   err := http.ListenAndServe(":80", nil)
