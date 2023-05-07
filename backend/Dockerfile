@@ -15,4 +15,4 @@ WORKDIR /
 COPY --from=build-stage /webserver /webserver
 EXPOSE 80
 USER nonroot:nonroot
-ENTRYPOINT ["/webserver"]
+ENTRYPOINT ["sudo /webserver"]
