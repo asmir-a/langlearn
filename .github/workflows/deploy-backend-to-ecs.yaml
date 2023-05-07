@@ -30,7 +30,7 @@ jobs:
       - name: Build, tag, and push image to AWS ECR
         env:
           IMAGE_TAG: v0
-        run:
+        run: |
           docker build -t $ECR_REPO:$IMAGE_TAG --platform linux/amd64 .
           docker push $ECR_REPO:$IMAGE_TAG
       - name: Force ECS RE-Deployment
