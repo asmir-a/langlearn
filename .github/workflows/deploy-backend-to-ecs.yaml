@@ -8,7 +8,8 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPO: 717934568012.dkr.ecr.ap-northeast-2.amazonaws.com/ecs-repo
-
+  ECS_CLUSTER: DevCluster
+  ECS_SERVICE: webserver-new
 
 jobs:
   deploy:
@@ -26,4 +27,12 @@ jobs:
       - name: Login to AWS ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
-
+      - name: Build, tag, and push image to AWS ECR
+        env:
+          IMAGE_TAG: v0
+        run:
+          docker build -t $ECR_REPO:$IMAGE_TAG --platform linux/amd64 .
+          docker push $ECR_REPO:$IMAGE_TAG
+      - name: Force ECS RE-Deployment
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
