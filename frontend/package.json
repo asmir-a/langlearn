@@ -1,0 +1,15 @@
+{
+  "name": "frontend",
+  "version": "0.0.1",
+  "description": "frontend for langlearn",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asmir-a/langlearn/frontend"
+  },
+  "author": "Asmir Abdimazhit",
+  "license": "UNLICENSED"
+}
