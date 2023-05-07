@@ -42,6 +42,5 @@ func main() {
   http.HandleFunc("/api/healthcheck", handleHealthCheck)
   http.HandleFunc("/api/handleHealthCheck", handleHealthCheck)
 
-  fmt.Println("stared serving requests")
   http.ListenAndServe(":80", nil)
 }
