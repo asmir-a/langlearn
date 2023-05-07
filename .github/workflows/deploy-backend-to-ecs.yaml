@@ -31,7 +31,7 @@ jobs:
         env:
           IMAGE_TAG: v0
         run: |
-          docker build -t $ECR_REPO:$IMAGE_TAG --platform linux/amd64 .
+          docker build -t $ECR_REPO:$IMAGE_TAG --platform linux/amd64 backend/
           docker push $ECR_REPO:$IMAGE_TAG
       - name: Force ECS RE-Deployment
         run: |
