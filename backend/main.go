@@ -43,5 +43,6 @@ func main() {
   http.HandleFunc("/api/handleHealthCheck", handleHealthCheck)
 
   fmt.Println("starting the server")
-  http.ListenAndServe(":80", nil)
+  err := http.ListenAndServe(":80", nil)
+  fmt.Println("server was shut down for some reason", err)
 }
