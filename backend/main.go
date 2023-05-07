@@ -44,5 +44,4 @@ func main() {
 
   fmt.Println("stared serving requests")
   http.ListenAndServe(":80", nil)
-  fmt.Println("server stopped for some reason")
 }
