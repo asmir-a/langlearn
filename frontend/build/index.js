@@ -1,14 +1,6 @@
 const labels = document.getElementsByTagName("h2");
 const buttons = document.getElementsByTagName("button");
 
-
-console.log("labels: ", labels);
-console.log("buttons: ", buttons);
-
-console.log("the button is: ", buttons[0]);
-console.log("the button with parenthesis notation is: ", buttons[0]);
-
-
 const handleOnClick = async () => {
   const fetchRandomNumber = async () => {
     console.log("sending request to the api endpoint");
