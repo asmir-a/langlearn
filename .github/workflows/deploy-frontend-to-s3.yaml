@@ -31,7 +31,8 @@ jobs:
       - name: Build Frontend
         run: |
           echo "$PWD"
-          npm run build ./frontend/
+          ls -all
+          npm --prefix ./frontend run build
       - name: Deploy To S3
         run:
           aws s3 cp --recursive frontend/build/ ${{ env.S3_BUCKET_URL }}
