@@ -32,6 +32,7 @@ jobs:
         run: |
           echo "$PWD"
           ls -all
+          npm --prefix ./frontend install
           npm --prefix ./frontend run build
       - name: Deploy To S3
         run:
