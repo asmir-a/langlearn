@@ -28,6 +28,11 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {from: 'public', to: './', globOptions: {ignore: ['**/index.html']}}
+      ]
     })
   ],
   mode: "development",
