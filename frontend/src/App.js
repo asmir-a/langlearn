@@ -1,10 +1,13 @@
 import React from 'react';
+import { useState } from 'react';
 
 const App = () => {
+  const [count, setCount] = useState(0);
   return (
-    <h1>
-      Hello World with create-react-app
-    </h1>
+    <>
+      <h1> Whatever {count} </h1>
+      <button onClick = {() => setCount(count + 1)}> INC </button>
+    </>
   );
 }
 
