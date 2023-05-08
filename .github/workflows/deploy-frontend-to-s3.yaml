@@ -24,6 +24,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
+      - name: Install node and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Build Frontend
+        run: npm run build ./frontend
       - name: Deploy To S3
         run:
           aws s3 cp --recursive frontend/build/ ${{ env.S3_BUCKET_URL }}
