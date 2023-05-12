@@ -1,7 +1,7 @@
 import yaml
 
-KOR_WORDS_PATH = "./../../data/original/kedict.yml"
-PART_OF_SPEECH_PATH = "./../../data/original/pos.yml"
+KOR_WORDS_PATH = "./../../../original/korean-words-basic-info.yml"
+PART_OF_SPEECH_PATH = "./../../../original/part-of-speech.yml"
 
 def extract_word_info(word_info_path = KOR_WORDS_PATH, part_of_speech_path = PART_OF_SPEECH_PATH):
     with open(word_info_path) as word_info, open(part_of_speech_path) as part_of_speech:

@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-PATH_TO_FREQ_LIST = "./../../data/original/wiki-5800.html"
+PATH_TO_FREQ_LIST = "./../../../original/wiki-5800.html"
 
 def extract_freq_info(file_path = PATH_TO_FREQ_LIST):
     with open(file_path) as file:
