@@ -8,6 +8,7 @@ const App = () => {
   const [count, setCount] = useState(0);
   return (
     <>
+      <h1>Mom I love you</h1>
       <h1> Whatever's count: {count} </h1>
       <button onClick = {() => setCount(count + 1)}> INC </button>
     </>
