@@ -35,6 +35,13 @@ func handleRandomNumber(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte(randomNumberText))
 }
 
+func handleGenerateImage(w http.ResponseWriter, req *http.Request) {
+  //need to use struct to json encoder
+  //need to send the request
+  //and get the response
+  //and do something with the response (important to use jpeg)
+}
+
 func main() {
   http.HandleFunc("/api/", handleRoot)
   http.HandleFunc("/api/healthcheck", handleHealthCheck)
