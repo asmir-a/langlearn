@@ -2,6 +2,8 @@ name: Deploy Frontend to AWS S3 action
 
 on:
   push:
+    branches:
+      - main
     paths:
       - frontend/**
 
