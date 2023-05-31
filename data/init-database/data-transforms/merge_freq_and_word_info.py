@@ -24,7 +24,6 @@ def get_full_word_info():
     freq_info_list = extract_freq_info()
 
     word_info_data_classes = map(lambda word_info: WordInfo(word_info["word"], word_info["part_of_speech"], word_info["defs"]), word_info_list)
-
     freq_info_data_classes = map(lambda freq_info: FreqInfo(freq_info["word"], freq_info["freq_rank"]), freq_info_list)
 
     word_info_frame = pd.DataFrame(word_info_data_classes)
