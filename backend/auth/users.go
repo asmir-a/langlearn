@@ -7,6 +7,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func insertUser(username string, passwordHash string, passwordSalt string) error {
+	query := `
+		INSERT INTO users (username, password_hash, password_salt)
+		VALUES ($1, $2, $3, $4)
+	`
+	_, err := database.Conn.Exec(context.Background(), query, username, passwordHash, passwordSalt)
+	return err
+}
+
 func checkIfUserExists(username string) (bool, error) {
 	query := `
 		SELECT username

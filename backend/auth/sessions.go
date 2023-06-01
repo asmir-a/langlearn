@@ -27,7 +27,7 @@ func createSessionFor(username string) error {
 		INSERT INTO sessions (session_key, username, login_time, last_seen_time)
 		VALUES ($1, $2, $3, $4)
 	`
-	newSessionKey := generateSessionKey()
+	newSessionKey := generateSessionKey(username)
 	loginTime := time.Now()
 	lastSeenTime := time.Now()
 
@@ -41,8 +41,8 @@ func replaceSessionFor(username string) error {
 		return nil
 	}
 
-	query := `
-	`
+	err = createSessionFor(username)
+	return err
 }
 
 func checkIfSessionExistsFor(username string) (bool, error) {
@@ -64,32 +64,6 @@ func checkIfSessionExistsFor(username string) (bool, error) {
 // for now, anytime you update the session, it is better to replace it as a whole cause the login might be coming from another device
 // with that in mind, each user prolly needs to have exactly one session in the database
 // nope, the user can still logout. in that case, the database should delete the session entry
-func isSessionValidFor(username string) (bool, error) {
-	query := `
-		SELECT * FROM sessions
-		WHERE username = $1
-	`
-
-	var sessionKeyDb, usernameDb string
-	var loginTimeDb, lastSeenTimeDb time.Time
-	err := database.Conn.QueryRow(context.Background(), query, username).Scan(&sessionKeyDb, &usernameDb, &loginTimeDb, &lastSeenTimeDb)
-
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			log.Fatal("session must be valid") //in the future transactions will be used to handle this case
-		}
-		return false, err
-	}
-
-	if time.Now().Sub(loginTimeDb) > SESSION_LOGIN_DURATION {
-		return false, nil
-	}
-
-	if time.Now().Sub(lastSeenTimeDb) > SESSION_USAGE_DURATION {
-		return false, nil
-	}
-}
-
 func checkIfSessionIsValidFor(username string) (bool, error) {
 	query := `
 		SELECT session_key, username, login_time, last_seen_time
@@ -119,6 +93,15 @@ func checkIfSessionIsValidFor(username string) (bool, error) {
 	} else {
 		return true, nil
 	}
+}
+
+func deleteSession(sessionKey string) error {
+	query := `
+		DELETE FROM sessions
+		WHERE session_key = $1
+	`
+	_, err := database.Conn.Exec(context.Background(), query, sessionKey)
+	return err
 }
 
 func deleteSessionFor(username string) error {

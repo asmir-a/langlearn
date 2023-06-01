@@ -68,18 +68,13 @@ func login(username string, password string) (err error) {
 		return err
 	}
 
-	sessionIsValid, err := checkIfSessionIsValidFor(username)
-	if !sessionIsValid {
-		err = replaceSessionFor(username)
-		return err
-	}
-
-	err = replaceSessionFor(username)
+	err = replaceSessionFor(username) //we do not care if the old session is valid or not; since we got the right login and password, we need to create a new valid session
 	return err
 	//todo: the session should be checked and deleted in a single database transaction
 }
 
-func logout(currentSession string) {
+func logout(currentSessionKey string) error {
 	//check if session is correct
 	//destroy session
+	return deleteSession(currentSessionKey)
 }
