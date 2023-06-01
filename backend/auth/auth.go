@@ -21,13 +21,14 @@ func signup(username string, password string) (err error) {
 	}
 
 	//todo: need to create a new session for the user
-	if err = createSession(username); err != nil {
+	if err = createSessionFor(username); err != nil {
 		return err
 	}
 
 	return
 }
 
+// todo: need to refactor this function; it is too long
 func login(username string, password string) (err error) {
 	userExists, err := checkIfUserExists(username)
 	if err != nil {
@@ -37,19 +38,27 @@ func login(username string, password string) (err error) {
 		return errors.New("user does not exist") //maybe need to create a custom error type
 	}
 
-	salt := getUserPasswordSalt(username)
+	salt, err := getUserPasswordSalt(username)
+	if err != nil {
+		return err
+	}
+
 	potentialPasswordHash, err := passwords.Hash(password, salt)
 	if err != nil {
 		return err
 	}
 
-	validPasswordHash := getUserPasswordHash(username)
+	validPasswordHash, err := getUserPasswordHash(username)
+	if err != nil {
+		return err
+	}
+
 	if potentialPasswordHash != validPasswordHash {
 		//todo: may be need to delete the session or not
 		return errors.New("wrong credentials")
 	}
 
-	sessionExists, err := checkIfSessionExistsFor(username)
+	sessionExists, err := checkIfSessionExistsFor(username) //might be unncessary; we can set up the constraint in the database
 	if err != nil {
 		return err
 	}
@@ -65,7 +74,7 @@ func login(username string, password string) (err error) {
 		return err
 	}
 
-	err = renewSessionFor(username)
+	err = replaceSessionFor(username)
 	return err
 	//todo: the session should be checked and deleted in a single database transaction
 }
@@ -73,9 +82,4 @@ func login(username string, password string) (err error) {
 func logout(currentSession string) {
 	//check if session is correct
 	//destroy session
-}
-
-func checkIfUserExists(username string) bool {
-	_ := getUsername(username) //need to parse the result; maybe, the number of rows or something like that
-	return true
 }
