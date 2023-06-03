@@ -7,12 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/asmir-a/langlearn/backend/database"
+	"github.com/asmir-a/langlearn/backend/routes"
 )
-
-func init() {
-	log.Println(database.Conn)
-}
 
 func handleRoot(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("request to root came")
@@ -31,7 +27,7 @@ func handleHealthCheck(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleRandomNumber(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("request to random-number came")
+	log.Println("request to random-number came")
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
@@ -40,6 +36,12 @@ func handleRandomNumber(w http.ResponseWriter, req *http.Request) {
 	randomNumberText := strconv.Itoa(randomNumber)
 
 	w.Write([]byte(randomNumberText))
+}
+
+func setUpAuthRoutes() {
+	http.HandleFunc("/api/signup", routes.HandleSignup)
+	http.HandleFunc("/api/login", routes.HandleLogin)
+	http.HandleFunc("/api/logout", routes.HandleLogout)
 }
 
 func handleGenerateImage(w http.ResponseWriter, req *http.Request) {
@@ -53,6 +55,8 @@ func main() {
 	http.HandleFunc("/api/", handleRoot)
 	http.HandleFunc("/api/healthcheck", handleHealthCheck)
 	http.HandleFunc("/api/random-number", handleRandomNumber)
+
+	setUpAuthRoutes()
 
 	fmt.Println("starting the server")
 	err := http.ListenAndServe(":80", nil)

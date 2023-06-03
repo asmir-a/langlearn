@@ -1,0 +1,14 @@
+panic: http: multiple registrations for /api/signup
+
+goroutine 1 [running]:
+net/http.(*ServeMux).Handle(0x10581e3a0, {0x1053b9a1c, 0xb}, {0x10554ee00?, 0x105540f88})
+	/opt/homebrew/Cellar/go/1.19.3/libexec/src/net/http/server.go:2503 +0x20c
+net/http.(*ServeMux).HandleFunc(...)
+	/opt/homebrew/Cellar/go/1.19.3/libexec/src/net/http/server.go:2540
+net/http.HandleFunc(...)
+	/opt/homebrew/Cellar/go/1.19.3/libexec/src/net/http/server.go:2552
+main.setUpAuthRoutes()
+	/Users/dev/fun/langlearn/backend/main.go:44 +0xa4
+main.main()
+	/Users/dev/fun/langlearn/backend/main.go:59 +0xa8
+exit status 2

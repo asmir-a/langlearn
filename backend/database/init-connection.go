@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
+  "github.com/joho/godotenv"
 )
 
-var DB_STRING = os.Getenv("DATABASE_URL")
 var Conn *pgx.Conn
 
 func init() {
@@ -16,6 +16,9 @@ func init() {
 }
 
 func initDbConn() {
+  godotenv.Load()
+  DB_STRING := os.Getenv("DB_STRING")
+
 	var err error
 	Conn, err = pgx.Connect(context.Background(), DB_STRING) //why context background
 

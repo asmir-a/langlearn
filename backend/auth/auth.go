@@ -6,75 +6,98 @@ import (
 	"github.com/asmir-a/langlearn/backend/auth/passwords"
 )
 
+func validateUsername(username string) bool {
+	if username == "" {
+		return false
+	}
+	//todo: other checks
+	return true
+}
+
+func validatePassword(password string) bool {
+	if password == "" {
+		return false
+	}
+
+	return true
+}
+
 // assumptions
 // there is no session before this begins
-func signup(username string, password string) (err error) {
+func Signup(username string, password string) (string, error) {
 	//todo: check if username already exists
+	if !validateUsername(username) || !validatePassword(password) {
+		return "", errors.New("wrong credentials format")
+	}
+
 	salt, err := passwords.Salt(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	hash, err := passwords.Hash(password, salt)
 	if err = insertUser(username, hash, salt); err != nil {
-		return err
+		return "", err
 	}
 
 	//todo: need to create a new session for the user
-	if err = createSessionFor(username); err != nil {
-		return err
+	sessionKey, err := createSessionFor(username)
+	if err != nil {
+		return "", err
 	}
 
-	return
+	return sessionKey, nil
 }
 
 // todo: need to refactor this function; it is too long
-func login(username string, password string) (err error) {
+func Login(username string, password string) (session_key string, err error) {
+	if !validateUsername(username) || !validatePassword(password) {
+		return "", errors.New("wrong credentials")
+	}
+
 	userExists, err := checkIfUserExists(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !userExists {
-		return errors.New("user does not exist") //maybe need to create a custom error type
+		return "", errors.New("user does not exist") //maybe need to create a custom error type
 	}
 
 	salt, err := getUserPasswordSalt(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	potentialPasswordHash, err := passwords.Hash(password, salt)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	validPasswordHash, err := getUserPasswordHash(username)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if potentialPasswordHash != validPasswordHash {
 		//todo: may be need to delete the session or not
-		return errors.New("wrong credentials")
+		return "", errors.New("wrong credentials")
 	}
 
 	sessionExists, err := checkIfSessionExistsFor(username) //might be unncessary; we can set up the constraint in the database
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if !sessionExists {
-		err = createSessionFor(username)
-		return err
+		sessionKey, err := createSessionFor(username)
+		return sessionKey, err
 	}
 
-	err = replaceSessionFor(username) //we do not care if the old session is valid or not; since we got the right login and password, we need to create a new valid session
-	return err
+	sessionKey, err := replaceSessionFor(username) //we do not care if the old session is valid or not; since we got the right login and password, we need to create a new valid session
+	return sessionKey, err
 	//todo: the session should be checked and deleted in a single database transaction
 }
 
-func logout(currentSessionKey string) error {
-	//check if session is correct
-	//destroy session
+func Logout(currentSessionKey string) error {
 	return deleteSession(currentSessionKey)
 }
