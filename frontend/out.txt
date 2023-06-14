@@ -1,0 +1,5 @@
+     257 ./node_modules/serve-index/public/style.css
+      87 ./build/styles.css
+      83 ./src/App.css
+     397 ./src/index.css
+     824 total
