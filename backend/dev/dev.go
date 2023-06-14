@@ -1,4 +1,4 @@
-package main
+package dev
 
 import (
 	"net/http"
@@ -8,15 +8,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func init() {
+func SetUpDevRoutes(mux *http.ServeMux) {
 	if err := godotenv.Load(); err != nil {
 		return
 	}
-
 	if isDevEnv, err := strconv.Atoi(os.Getenv("DEVELOPMENT")); err != nil || isDevEnv != 1 {
 		return
 	}
-
-	fs := http.FileServer(http.Dir("./../frontend/build"))
-	http.Handle("/", fs)
+	frontendBuildDir := http.Dir("./../frontend/build")
+	fs := http.FileServer(frontendBuildDir)
+	mux.Handle("/", fs)
 }

@@ -1,4 +1,4 @@
-package database
+package dbconnholder
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
-  "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 )
 
 var Conn *pgx.Conn
@@ -16,8 +16,8 @@ func init() {
 }
 
 func initDbConn() {
-  godotenv.Load()
-  DB_STRING := os.Getenv("DB_STRING")
+	godotenv.Load()
+	DB_STRING := os.Getenv("DB_STRING")
 
 	var err error
 	Conn, err = pgx.Connect(context.Background(), DB_STRING) //why context background

@@ -1,22 +1,22 @@
-package auth
+package dbwrappers
 
 import (
 	"context"
 
-	"github.com/asmir-a/langlearn/backend/database"
+	"github.com/asmir-a/langlearn/backend/dbconnholder"
 	"github.com/jackc/pgx/v5"
 )
 
-func insertUser(username string, passwordHash string, passwordSalt string) error {
+func InsertUser(username string, passwordHash string, passwordSalt string) error {
 	query := `
 		INSERT INTO users (username, password_hash, password_salt)
 		VALUES ($1, $2, $3)
 	`
-	_, err := database.Conn.Exec(context.Background(), query, username, passwordHash, passwordSalt)
+	_, err := dbconnholder.Conn.Exec(context.Background(), query, username, passwordHash, passwordSalt)
 	return err
 }
 
-func checkIfUserExists(username string) (bool, error) {
+func CheckIfUserExists(username string) (bool, error) {
 	query := `
 		SELECT username
 		FROM users
@@ -24,7 +24,7 @@ func checkIfUserExists(username string) (bool, error) {
 	`
 
 	var usernameDB string
-	err := database.Conn.QueryRow(context.Background(), query, username).Scan(&usernameDB)
+	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&usernameDB)
 
 	if err == nil {
 		return true, nil
@@ -35,7 +35,7 @@ func checkIfUserExists(username string) (bool, error) {
 	}
 }
 
-func getUserPasswordHash(username string) (string, error) {
+func GetUserPasswordHash(username string) (string, error) {
 	//assumes that the user with username exists in the database
 	query := `
 		SELECT password_hash
@@ -43,12 +43,12 @@ func getUserPasswordHash(username string) (string, error) {
 		WHERE username = $1
 	`
 	var passwordHashDB string
-	err := database.Conn.QueryRow(context.Background(), query, username).Scan(&passwordHashDB)
+	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordHashDB)
 
 	return passwordHashDB, err
 }
 
-func getUserPasswordSalt(username string) (string, error) {
+func GetUserPasswordSalt(username string) (string, error) {
 	//assumes that the user with username exists
 	query := `
 		SELECT password_salt
@@ -57,7 +57,7 @@ func getUserPasswordSalt(username string) (string, error) {
 	`
 
 	var passwordSaltDB string
-	err := database.Conn.QueryRow(context.Background(), query, username).Scan(&passwordSaltDB)
+	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordSaltDB)
 
 	return passwordSaltDB, err
 }

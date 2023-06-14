@@ -2,7 +2,7 @@ package passwords
 
 import (
 	"crypto/rand"
-	"log"
+	"encoding/base64"
 )
 
 const SALT_LENGTH = 128
@@ -10,9 +10,6 @@ const SALT_LENGTH = 128
 func Salt(username string) (randomSalt string, err error) {
 	randomSaltBytes := make([]byte, SALT_LENGTH)
 	_, err = rand.Read(randomSaltBytes)
-	if err != nil {
-		log.Println("rand.Read failed")
-	}
-	randomSalt = username + string(randomSaltBytes)
-	return
+	randomSaltString := base64.StdEncoding.EncodeToString(randomSaltBytes)
+	return username + randomSaltString, nil
 }
