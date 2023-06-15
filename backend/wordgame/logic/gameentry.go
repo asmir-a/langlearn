@@ -2,20 +2,16 @@ package logic
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/asmir-a/langlearn/backend/wordgame/dbwrappers"
 	"github.com/asmir-a/langlearn/backend/wordgame/imagesearch"
 )
 
-const fileLevelDebugInfo = "wordgame logic "
-
 func getGameEntry() (WordGameEntry, *httperrors.HttpError) {
-	const funcLevelDebugInfo = "GetGameEntry "
 	words, httpErr := dbwrappers.GetRandomKoreanWords()
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr, fileLevelDebugInfo+funcLevelDebugInfo)
+		return WordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	correctWordIndex := 0
@@ -25,7 +21,7 @@ func getGameEntry() (WordGameEntry, *httperrors.HttpError) {
 
 	correctWordImageUrl, httpErr := imagesearch.FetchImageUrlFor(correctWordDef)
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr, fileLevelDebugInfo+funcLevelDebugInfo)
+		return WordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	incorrectWordsWithDefs := words[1:]
@@ -39,7 +35,6 @@ func getGameEntry() (WordGameEntry, *httperrors.HttpError) {
 }
 
 func GetGameEntryJson() (string, *httperrors.HttpError) {
-	const funcLevelDebugInfo = "GetGameEntryJson "
 	gameEntry, httpErr := getGameEntry()
 	if httpErr != nil {
 		return "", httpErr
@@ -47,18 +42,9 @@ func GetGameEntryJson() (string, *httperrors.HttpError) {
 
 	gameEntryBytes, err := json.Marshal(gameEntry)
 	if err != nil {
-		newHttpErr := httperrors.NewHttpError(
-			err,
-			http.StatusInternalServerError,
-			"something went wrong",
-			fileLevelDebugInfo+funcLevelDebugInfo+"json.Marshal",
-		)
+		newHttpErr := httperrors.NewHttp500Error(err)
 		return "", newHttpErr
 	}
 
 	return string(gameEntryBytes), nil
-}
-
-func CheckSubmission(submission WordGameSubmission) *httperrors.HttpError {
-	return nil
 }

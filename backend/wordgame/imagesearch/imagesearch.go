@@ -10,8 +10,6 @@ import (
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
-const fileLevelDebugInfo = "wordgame imagesearch "
-
 var googleImageSearchUrl string = os.Getenv("GOOGLE_IMAGE_SEARCH_URL")
 var googleImageSearchEngineId string = os.Getenv("GOOGLE_IMAGE_SEARCH_ENGINE_ID")
 var googleImageSearchToken string = os.Getenv("GOOGLE_IMAGE_SEARCH_TOKEN")
@@ -36,34 +34,20 @@ type googleImageSearchResponseItems struct {
 }
 
 func filterAndConvertFromJsonToData(responseBody string) (googleImageSearchResponseItems, *httperrors.HttpError) {
-	const funcLevelDebugInfo = "filterAndConvertFromJsonToData"
 	responseBytes := []byte(responseBody)
 	responseData := googleImageSearchResponseItems{}
 	if err := json.Unmarshal(responseBytes, &responseData); err != nil {
-		newHttpErr := httperrors.NewHttpError(
-			err,
-			http.StatusInternalServerError,
-			"something went wrong",
-			fileLevelDebugInfo+funcLevelDebugInfo+"json.Unmarshal",
-		)
-		return googleImageSearchResponseItems{}, newHttpErr
+		return googleImageSearchResponseItems{}, httperrors.NewHttp500Error(err)
 	}
 	return responseData, nil
 }
 
 func fetchResponseItemsFor(query string) (googleImageSearchResponseItems, *httperrors.HttpError) {
-	const funcLevelDebugInfo = "fetchResponseItemsFor "
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", googleImageSearchUrl, nil)
 	if err != nil {
-		newHttpErr := httperrors.NewHttpError(
-			err,
-			http.StatusInternalServerError,
-			"something went wrong",
-			fileLevelDebugInfo+funcLevelDebugInfo+"http.NewRequest(GET, googleImageSearchUrl)",
-		)
-		return googleImageSearchResponseItems{}, newHttpErr
+		return googleImageSearchResponseItems{}, httperrors.NewHttp500Error(err)
 	}
 
 	requestUrlParams := url.Values{}
@@ -75,41 +59,27 @@ func fetchResponseItemsFor(query string) (googleImageSearchResponseItems, *httpe
 
 	response, err := client.Do(req)
 	if err != nil {
-		newHttpErr := httperrors.NewHttpError(
-			err,
-			http.StatusInternalServerError,
-			"something went wrong",
-			fileLevelDebugInfo+funcLevelDebugInfo+"client.Do(req)",
-		)
-		return googleImageSearchResponseItems{}, newHttpErr
+		return googleImageSearchResponseItems{}, httperrors.NewHttp500Error(err)
 	}
 	defer response.Body.Close()
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		newHttpErr := httperrors.NewHttpError(
-			err,
-			http.StatusInternalServerError,
-			"something went wrong",
-			fileLevelDebugInfo+funcLevelDebugInfo+"io.ReadAll(response.Body)",
-		)
-		return googleImageSearchResponseItems{}, newHttpErr
+		return googleImageSearchResponseItems{}, httperrors.NewHttp500Error(err)
 	}
 	bodyString := string(bodyBytes)
 
 	responseData, httpErr := filterAndConvertFromJsonToData(bodyString)
 	if httpErr != nil {
-		return googleImageSearchResponseItems{}, httperrors.WrapError(httpErr, fileLevelDebugInfo+funcLevelDebugInfo)
+		return googleImageSearchResponseItems{}, httperrors.WrapError(httpErr)
 	}
 	return responseData, nil
 }
 
 func FetchImageUrlFor(query string) (string, *httperrors.HttpError) {
-	const funcLevelDebugInfo = "FetchImageUrlFor "
-
 	responseItems, httpErr := fetchResponseItemsFor(query)
 	if httpErr != nil {
-		return "", httperrors.WrapError(httpErr, fileLevelDebugInfo+funcLevelDebugInfo)
+		return "", httperrors.WrapError(httpErr)
 	}
 	return responseItems.Items[0].Link, nil
 }

@@ -4,19 +4,20 @@ import (
 	"context"
 
 	"github.com/asmir-a/langlearn/backend/dbconnholder"
+	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/jackc/pgx/v5"
 )
 
-func InsertUser(username string, passwordHash string, passwordSalt string) error {
+func InsertUser(username string, passwordHash string, passwordSalt string) *httperrors.HttpError {
 	query := `
 		INSERT INTO users (username, password_hash, password_salt)
 		VALUES ($1, $2, $3)
 	`
 	_, err := dbconnholder.Conn.Exec(context.Background(), query, username, passwordHash, passwordSalt)
-	return err
+	return httperrors.NewHttp500Error(err)
 }
 
-func CheckIfUserExists(username string) (bool, error) {
+func CheckIfUserExists(username string) (bool, *httperrors.HttpError) {
 	query := `
 		SELECT username
 		FROM users
@@ -31,11 +32,11 @@ func CheckIfUserExists(username string) (bool, error) {
 	} else if err != nil && err != pgx.ErrNoRows {
 		return false, nil
 	} else {
-		return false, err
+		return false, httperrors.NewHttp500Error(err)
 	}
 }
 
-func GetUserPasswordHash(username string) (string, error) {
+func GetUserPasswordHash(username string) (string, *httperrors.HttpError) {
 	//assumes that the user with username exists in the database
 	query := `
 		SELECT password_hash
@@ -45,10 +46,10 @@ func GetUserPasswordHash(username string) (string, error) {
 	var passwordHashDB string
 	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordHashDB)
 
-	return passwordHashDB, err
+	return passwordHashDB, httperrors.NewHttp500Error(err)
 }
 
-func GetUserPasswordSalt(username string) (string, error) {
+func GetUserPasswordSalt(username string) (string, *httperrors.HttpError) {
 	//assumes that the user with username exists
 	query := `
 		SELECT password_salt
@@ -59,5 +60,5 @@ func GetUserPasswordSalt(username string) (string, error) {
 	var passwordSaltDB string
 	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordSaltDB)
 
-	return passwordSaltDB, err
+	return passwordSaltDB, httperrors.NewHttp500Error(err)
 }

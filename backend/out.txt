@@ -11,11 +11,13 @@
       14 ./auth/routes/routesetupper.go
      126 ./auth/routes/routehandlers.go
       21 ./dev/dev.go
-      67 ./wordgame/logic/gameentry.go
+      64 ./wordgame/logic/gameentry.go
+      12 ./wordgame/logic/types.go
      115 ./wordgame/imagesearch/imagesearch.go
+     140 ./wordgame/dbwrappers/knows.go
      107 ./wordgame/dbwrappers/dbwrappers.go
       13 ./wordgame/routes/routesetuppers.go
-      21 ./wordgame/routes/routehandlers.go
+      24 ./wordgame/routes/routehandlers.go
       28 ./dbconnholder/init-connection.go
       23 ./main.go
-    1106 total
+    1258 total

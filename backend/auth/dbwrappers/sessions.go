@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/asmir-a/langlearn/backend/dbconnholder"
+	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -19,13 +20,13 @@ const SESSION_USAGE_DURATION = time.Duration(time.Hour * 24)
 func generateSessionKey(username string) string {
 	randomBytes := make([]byte, SESSION_ID_LENGTH)
 	if _, err := rand.Read(randomBytes); err != nil { //todo: think more if this is secure
-		log.Fatal("could not generate random bytes: ", err)
+		log.Fatal("should be impossible")
 	}
 	randomString := base64.StdEncoding.EncodeToString(randomBytes)
 	return username + randomString
 }
 
-func CreateSessionFor(username string) (string, error) {
+func CreateSessionFor(username string) (string, *httperrors.HttpError) {
 	query := `
 		INSERT INTO sessions (session_key, username, login_time, last_seen_time)
 		VALUES ($1, $2, $3, $4)
@@ -35,20 +36,20 @@ func CreateSessionFor(username string) (string, error) {
 	lastSeenTime := time.Now()
 
 	_, err := dbconnholder.Conn.Exec(context.Background(), query, newSessionKey, username, loginTime, lastSeenTime)
-	return newSessionKey, err
+	return newSessionKey, httperrors.NewHttp500Error(err)
 }
 
-func ReplaceSessionFor(username string) (string, error) {
+func ReplaceSessionFor(username string) (string, *httperrors.HttpError) {
 	err := DeleteSessionFor(username)
 	if err != nil {
-		return "", err
+		return "", httperrors.NewHttp500Error(err)
 	}
 
 	sessionKey, err := CreateSessionFor(username)
-	return sessionKey, err
+	return sessionKey, httperrors.NewHttp500Error(err)
 }
 
-func CheckIfSessionExistsFor(username string) (bool, error) {
+func CheckIfSessionExistsFor(username string) (bool, *httperrors.HttpError) {
 	query := `
 		SELECT * FROM sessions
 		WHERE username = $1
@@ -60,14 +61,14 @@ func CheckIfSessionExistsFor(username string) (bool, error) {
 	} else if err == pgx.ErrNoRows {
 		return false, nil
 	} else {
-		return false, err
+		return false, httperrors.NewHttp500Error(err)
 	}
 }
 
 // for now, anytime you update the session, it is better to replace it as a whole cause the login might be coming from another device
 // with that in mind, each user prolly needs to have exactly one session in the database
 // nope, the user can still logout. in that case, the database should delete the session entry
-func CheckIfSessionIsValidFor(username string) (bool, error) {
+func CheckIfSessionIsValidFor(username string) (bool, *httperrors.HttpError) {
 	query := `
 		SELECT session_key, username, login_time, last_seen_time
 		FROM sessions
@@ -86,7 +87,7 @@ func CheckIfSessionIsValidFor(username string) (bool, error) {
 		&lastSeenTimeDB,
 	)
 	if err != nil {
-		return false, err
+		return false, httperrors.NewHttp500Error(err)
 	}
 
 	loggedInTooLongAgo := time.Now().Sub(loginTimeDB) > SESSION_LOGIN_DURATION
@@ -98,16 +99,16 @@ func CheckIfSessionIsValidFor(username string) (bool, error) {
 	}
 }
 
-func DeleteSession(sessionKey string) error {
+func DeleteSession(sessionKey string) *httperrors.HttpError {
 	query := `
 		DELETE FROM sessions
 		WHERE session_key = $1
 	`
 	_, err := dbconnholder.Conn.Exec(context.Background(), query, sessionKey)
-	return err
+	return httperrors.NewHttp500Error(err)
 }
 
-func DeleteSessionFor(username string) error {
+func DeleteSessionFor(username string) *httperrors.HttpError {
 	query := `
 		DELETE FROM sessions
 		WHERE username = $1
@@ -115,13 +116,13 @@ func DeleteSessionFor(username string) error {
 
 	_, err := dbconnholder.Conn.Exec(context.Background(), query, username)
 	if err != nil {
-		return err
+		return httperrors.NewHttp500Error(err)
 	}
 
 	return nil
 }
 
-func CheckIfSessionExists(session_key string) (bool, error) {
+func CheckIfSessionExists(session_key string) (bool, *httperrors.HttpError) {
 	query := `
 		SELECT session_key
 		FROM sessions
@@ -137,14 +138,14 @@ func CheckIfSessionExists(session_key string) (bool, error) {
 	} else if err == nil {
 		return true, nil
 	} else {
-		return false, err
+		return false, httperrors.NewHttp500Error(err)
 	}
 }
 
-func CheckIfSessionIsValid(session_key string) (bool, error) {
-	sessionExists, err := CheckIfSessionExists(session_key)
-	if err != nil {
-		return false, err
+func CheckIfSessionIsValid(session_key string) (bool, *httperrors.HttpError) {
+	sessionExists, httpErr := CheckIfSessionExists(session_key)
+	if httpErr != nil {
+		return false, httpErr
 	}
 	if !sessionExists { //todo: this might even be impossible; can just put assert(0) or leave it empty
 		return false, nil
@@ -156,11 +157,11 @@ func CheckIfSessionIsValid(session_key string) (bool, error) {
 		WHERE session_key = $1
 	`
 	var loginTime, lastSeenTime time.Time
-	err = dbconnholder.Conn.QueryRow(context.Background(), query, session_key).Scan(&loginTime, &lastSeenTime)
+	err := dbconnholder.Conn.QueryRow(context.Background(), query, session_key).Scan(&loginTime, &lastSeenTime)
 	if err != nil {
 		fmt.Println("query row error")
 		fmt.Println("error is: ", err)
-		return false, err
+		return false, httperrors.NewHttp500Error(err)
 	}
 	loggedInTooLongAgo := time.Now().Sub(loginTime) > SESSION_LOGIN_DURATION
 	lastSeenTooLongAgo := time.Now().Sub(lastSeenTime) > SESSION_USAGE_DURATION

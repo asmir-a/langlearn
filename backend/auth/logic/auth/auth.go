@@ -1,7 +1,5 @@
 package auth
 
-const currentFilePath = "auth:auth:"
-
 //todo: this must reside somewhere else
 //maybe logic/validation
 //or logic/utilities
