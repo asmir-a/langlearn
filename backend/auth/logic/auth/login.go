@@ -9,64 +9,77 @@ import (
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
-// todo: need to refactor this function; it is too long
-func Login(username string, password string) (string, *httperrors.HttpError) {
-	if !validateUsername(username) || !validatePassword(password) {
-		return "", httperrors.NewHttpError(
-			errors.New("invalid username or password"),
-			http.StatusUnauthorized,
-			"invalid username or password format",
-		)
+func checkIfUserExistsForLogin(username string, password string) *httperrors.HttpError {
+	userExists, httpErr := dbwrappers.CheckIfUserExists(username)
+	if httpErr != nil {
+		return httperrors.NewHttp500Error(httpErr)
 	}
-
-	userExists, err := dbwrappers.CheckIfUserExists(username)
-	if err == nil && !userExists {
-		return "", httperrors.NewHttpError(
+	if !userExists {
+		return httperrors.NewHttpError(
 			errors.New("user with that username does not exist"),
 			http.StatusUnauthorized,
 			"user with provided username does not exist",
 		)
-	} else if err != nil {
-		return "", httperrors.NewHttp500Error(err)
 	}
+	return nil
+}
 
-	salt, err := dbwrappers.GetUserPasswordSalt(username)
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
+func isPasswordCorrect(username string, password string) *httperrors.HttpError {
+	salt, httpErr := dbwrappers.GetUserPasswordSalt(username)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
 	}
-
 	potentialPasswordHash := passwords.Hash(password, salt)
-	validPasswordHash, err := dbwrappers.GetUserPasswordHash(username)
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
+	validPasswordHash, httpErr := dbwrappers.GetUserPasswordHash(username)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
 	}
-
 	if potentialPasswordHash != validPasswordHash {
-		//todo: may be need to delete the session or not
-		return "", httperrors.NewHttpError(
+		return httperrors.NewHttpError(
 			errors.New("wrong password"),
 			http.StatusUnauthorized,
 			"wrong password",
 		)
 	}
+	return nil
+}
 
-	sessionExists, err := dbwrappers.CheckIfSessionExistsFor(username) //might be unncessary; we can set up the constraint in the database
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
-
+func createNewSessionFor(username string) (string, *httperrors.HttpError) {
+	sessionExists, httpErr := dbwrappers.CheckIfSessionExistsFor(username)
+	if httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
 	}
 	if !sessionExists {
-		sessionKey, err := dbwrappers.CreateSessionFor(username)
-		if err != nil {
-			return "", httperrors.NewHttp500Error(err)
+		sessionKey, httpErr := dbwrappers.CreateSessionFor(username)
+		if httpErr != nil {
+			return "", httperrors.WrapError(httpErr)
 		}
 		return sessionKey, nil
 	}
-
-	sessionKey, err := dbwrappers.ReplaceSessionFor(username) //we do not care if the old session is valid or not; since we got the right login and password, we need to create a new valid session
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
+	sessionKey, httpErr := dbwrappers.ReplaceSessionFor(username)
+	if httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
 	}
 	return sessionKey, nil
+}
+
+func Login(username string, password string) (string, *httperrors.HttpError) {
+	if httpErr := validateCredentials(username, password); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
+
+	if httpErr := checkIfUserExistsForLogin(username, password); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
+
+	if httpErr := isPasswordCorrect(username, password); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
+
+	if sessionKey, httpErr := createNewSessionFor(username); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	} else {
+		return sessionKey, nil
+	}
 	//todo: the session should be checked and deleted in a single database transaction
 }

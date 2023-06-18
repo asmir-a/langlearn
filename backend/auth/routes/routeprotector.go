@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/asmir-a/langlearn/backend/auth/dbwrappers"
@@ -18,8 +19,14 @@ func CheckIfAuthed(handler http.Handler) http.Handler { //todo: this might not b
 
 		}
 
-		sessionIsValid, err := dbwrappers.CheckIfSessionIsValid(sessionCookie.Value)
-		if err != nil {
+		if sessionCookie.Value == "" { //todo: it might be needed to have a session validation function for the session format, eg
+			http.Error(w, "invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		sessionIsValid, httpErr := dbwrappers.CheckIfSessionIsValid(sessionCookie.Value)
+		if httpErr != nil {
+			log.Fatal(err)
 			http.Error(w, "something went wrong verifying credentials", http.StatusInternalServerError)
 			return
 		}

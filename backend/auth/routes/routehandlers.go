@@ -1,14 +1,14 @@
 package routes
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/asmir-a/langlearn/backend/auth/dbwrappers"
 	authLogic "github.com/asmir-a/langlearn/backend/auth/logic/auth"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
-
-const currentFilePath = "routes:auth:"
 
 func handleSignup(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
 	if err := req.ParseMultipartForm(1 << 10); err != nil {
@@ -59,6 +59,7 @@ func handleIsAuthed(w http.ResponseWriter, req *http.Request) *httperrors.HttpEr
 	} else if err != nil {
 		return httperrors.NewHttp500Error(err)
 	}
+
 	if cookie.Value == "" {
 		return httperrors.NewHttpError(
 			errors.New("empty string in cookie"),
@@ -67,7 +68,18 @@ func handleIsAuthed(w http.ResponseWriter, req *http.Request) *httperrors.HttpEr
 		)
 	}
 
-	w.Write([]byte(""))
+	session_key := cookie.Value
+	userBytes, httpErr := dbwrappers.GetUserWith(session_key)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+
+	userJson, err := json.Marshal(userBytes)
+	if err != nil {
+		return httperrors.NewHttp500Error(err) //this prolly belongs to somewhere else, where the json is handled
+	}
+	w.Write(userJson)
+
 	return nil
 }
 
@@ -93,8 +105,5 @@ func handleLogout(w http.ResponseWriter, req *http.Request) *httperrors.HttpErro
 	}
 
 	setCookieToDeleteSession(w)
-	w.WriteHeader(http.StatusOK)
-
-	w.Write([]byte(""))
 	return nil
 }

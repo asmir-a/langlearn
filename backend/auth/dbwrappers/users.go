@@ -13,8 +13,16 @@ func InsertUser(username string, passwordHash string, passwordSalt string) *http
 		INSERT INTO users (username, password_hash, password_salt)
 		VALUES ($1, $2, $3)
 	`
-	_, err := dbconnholder.Conn.Exec(context.Background(), query, username, passwordHash, passwordSalt)
-	return httperrors.NewHttp500Error(err)
+	if _, err := dbconnholder.Conn.Exec(
+		context.Background(),
+		query,
+		username,
+		passwordHash,
+		passwordSalt,
+	); err != nil {
+		return httperrors.NewHttp500Error(err)
+	}
+	return nil
 }
 
 func CheckIfUserExists(username string) (bool, *httperrors.HttpError) {
@@ -23,13 +31,15 @@ func CheckIfUserExists(username string) (bool, *httperrors.HttpError) {
 		FROM users
 		WHERE username = $1
 	`
-
 	var usernameDB string
-	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&usernameDB)
-
+	err := dbconnholder.Conn.QueryRow(
+		context.Background(),
+		query,
+		username,
+	).Scan(&usernameDB)
 	if err == nil {
 		return true, nil
-	} else if err != nil && err != pgx.ErrNoRows {
+	} else if err == pgx.ErrNoRows {
 		return false, nil
 	} else {
 		return false, httperrors.NewHttp500Error(err)
@@ -44,9 +54,14 @@ func GetUserPasswordHash(username string) (string, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var passwordHashDB string
-	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordHashDB)
-
-	return passwordHashDB, httperrors.NewHttp500Error(err)
+	if err := dbconnholder.Conn.QueryRow(
+		context.Background(),
+		query,
+		username,
+	).Scan(&passwordHashDB); err != nil {
+		return "", httperrors.NewHttp500Error(err)
+	}
+	return passwordHashDB, nil
 }
 
 func GetUserPasswordSalt(username string) (string, *httperrors.HttpError) {
@@ -56,9 +71,13 @@ func GetUserPasswordSalt(username string) (string, *httperrors.HttpError) {
 		FROM users
 		WHERE username = $1
 	`
-
 	var passwordSaltDB string
-	err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&passwordSaltDB)
-
-	return passwordSaltDB, httperrors.NewHttp500Error(err)
+	if err := dbconnholder.Conn.QueryRow(
+		context.Background(),
+		query,
+		username,
+	).Scan(&passwordSaltDB); err != nil {
+		return "", httperrors.NewHttp500Error(err)
+	}
+	return passwordSaltDB, nil
 }

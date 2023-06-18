@@ -57,7 +57,7 @@ type HandlerWithHttpError func(w http.ResponseWriter, r *http.Request) *HttpErro
 
 func (fn HandlerWithHttpError) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := fn(w, r); err != nil {
-		log.Printf("there was an http error with error: %v and debug info: %s:", err.RootErr, err.Debug)
+		log.Printf("there was an http error with error: %v and debug info: %s", err.RootErr, err.Debug)
 		http.Error(w, err.Message, err.StatusCode)
 	}
 }

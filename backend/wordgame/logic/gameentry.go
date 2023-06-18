@@ -2,6 +2,7 @@ package logic
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/asmir-a/langlearn/backend/wordgame/dbwrappers"
@@ -47,4 +48,63 @@ func GetGameEntryJson() (string, *httperrors.HttpError) {
 	}
 
 	return string(gameEntryBytes), nil
+}
+
+func correctAnswer(username string, word string) *httperrors.HttpError {
+	rowExists, httpErr := dbwrappers.DoesRowExists(username, word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	if !rowExists {
+		httpErr = dbwrappers.CreateNewRowInKnows(username, word)
+		if httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		return nil
+	}
+
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	httpErr = dbwrappers.IncrementCurrentCount(username, word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	return nil
+}
+
+func incorrectAnswer(username string, word string) *httperrors.HttpError {
+	rowExists, httpErr := dbwrappers.DoesRowExists(username, word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+
+	if !rowExists {
+		return nil
+	}
+
+	currentCount, httpErr := dbwrappers.GetCurrentCount(username, word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+
+	if currentCount <= 0 {
+		return httperrors.NewHttp500Error(errors.New("current count cannot be equal to or less than 0"))
+	}
+	if currentCount == 1 {
+		httpErr := dbwrappers.DeleteRowInKnows(username, word)
+		if httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		return nil
+	}
+	httpErr = dbwrappers.DecrementCurrentCount(username, word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	return nil
+}
+
+func CheckSubmission(submission WordGameSubmission) *httperrors.HttpError {
+	return nil
 }

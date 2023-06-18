@@ -9,40 +9,46 @@ import (
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
-// todo: need to refactor; split to multiple functions
-func Signup(username string, password string) (string, *httperrors.HttpError) {
-	if !validateUsername(username) || !validatePassword(password) {
-		return "", httperrors.NewHttpError(
-			errors.New("invalid login or password"),
-			http.StatusUnauthorized,
-			"invalid username or password",
-		)
-	}
+func checkIfUserExistsForSignup(username string) *httperrors.HttpError {
+	usernameExists, httpErr := dbwrappers.CheckIfUserExists(username)
 
-	usernameExists, err := dbwrappers.CheckIfUserExists(username)
-	if err == nil && usernameExists {
-		return "", httperrors.NewHttpError(
+	if httpErr == nil && usernameExists {
+		return httperrors.NewHttpError(
 			errors.New("username already exists"),
 			http.StatusConflict,
 			"username already exists",
 		)
-	} else if err != nil {
-		return "", httperrors.NewHttp500Error(err)
 	}
 
-	salt, err := passwords.Salt(username)
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
 	}
 
+	return nil
+}
+
+func Signup(username string, password string) (string, *httperrors.HttpError) {
+	if httpErr := validateCredentials(username, password); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
+
+	if httpErr := checkIfUserExistsForSignup(username); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
+
+	salt, httpErr := passwords.Salt(username)
+	if httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
+	}
 	hash := passwords.Hash(password, salt)
-	if err = dbwrappers.InsertUser(username, hash, salt); err != nil {
-		return "", httperrors.NewHttp500Error(err)
+
+	if httpErr = dbwrappers.InsertUser(username, hash, salt); httpErr != nil {
+		return "", httperrors.WrapError(httpErr)
 	}
 
-	sessionKey, err := dbwrappers.CreateSessionFor(username)
-	if err != nil {
-		return "", httperrors.NewHttp500Error(err)
+	sessionKey, httpErr := dbwrappers.CreateSessionFor(username)
+	if httpErr != nil {
+		return "", httperrors.WrapError(httpErr) //todo: use reflection to say that httperror cannot be used in wraperror
 	}
 
 	return sessionKey, nil

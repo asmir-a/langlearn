@@ -17,7 +17,7 @@ type Knows struct {
 	CurrentCount int
 }
 
-func doesRowExists(username string, word string) (bool, *httperrors.HttpError) {
+func DoesRowExists(username string, word string) (bool, *httperrors.HttpError) {
 	query := `
 		SELECT username
 		FROM knows
@@ -34,7 +34,7 @@ func doesRowExists(username string, word string) (bool, *httperrors.HttpError) {
 	}
 }
 
-func getCurrentCount(username string, word string) (int, *httperrors.HttpError) {
+func GetCurrentCount(username string, word string) (int, *httperrors.HttpError) {
 	query := `
 		SELECT current_count
 		FROM knows
@@ -51,7 +51,7 @@ func getCurrentCount(username string, word string) (int, *httperrors.HttpError) 
 	}
 }
 
-func incrementCurrentCount(username string, word string) *httperrors.HttpError {
+func IncrementCurrentCount(username string, word string) *httperrors.HttpError {
 	query := `
 		UPDATE knows
 		SET current_count = current_count + 1
@@ -63,7 +63,7 @@ func incrementCurrentCount(username string, word string) *httperrors.HttpError {
 	return nil
 }
 
-func decrementCurrentCount(username string, word string) *httperrors.HttpError {
+func DecrementCurrentCount(username string, word string) *httperrors.HttpError {
 	query := `
 		UPDATE knows
 		SET current_count = current_count - 1
@@ -75,7 +75,7 @@ func decrementCurrentCount(username string, word string) *httperrors.HttpError {
 	return nil
 }
 
-func createNewRowInKnows(username string, word string) *httperrors.HttpError {
+func CreateNewRowInKnows(username string, word string) *httperrors.HttpError {
 	query := `
 		INSERT INTO knows(username, word, word_count) 
 		VALUES ($1, $2, $3)
@@ -86,7 +86,7 @@ func createNewRowInKnows(username string, word string) *httperrors.HttpError {
 	return nil
 }
 
-func deleteRowInKnows(username string, word string) *httperrors.HttpError {
+func DeleteRowInKnows(username string, word string) *httperrors.HttpError {
 	query := `
 		DELETE FROM knows
 		WHERE username = $1 AND word = $2
