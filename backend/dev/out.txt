@@ -1,0 +1,25 @@
+[33m[nodemon] 2.0.22[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: go[39m
+[32m[nodemon] starting `go run ./../.`[39m
+# github.com/asmir-a/langlearn/backend/wordgame/routes
+../wordgame/routes/routehandlers.go:21:1: missing return
+[31m[nodemon] process failed, unhandled exit code (2)[39m
+[31m[nodemon] [39m
+[31m[nodemon] Either the command has a syntax error,[39m
+[31m[nodemon] or it is exiting with reserved code 2.[39m
+[31m[nodemon] [39m
+[31m[nodemon] To keep nodemon running even after a code 2,[39m
+[31m[nodemon] add this to the end of your command: || exit 1[39m
+[31m[nodemon] [39m
+[31m[nodemon] Read more here: https://git.io/fNOAG[39m
+[31m[nodemon] [39m
+[31m[nodemon] nodemon will stop now so that you can fix the command.[39m
+[31m[nodemon] [39m
+[31m[nodemon] Error
+    at Bus.<anonymous> (/opt/homebrew/lib/node_modules/nodemon/lib/nodemon.js:158:25)
+    at Bus.emit (node:events:524:35)
+    at ChildProcess.<anonymous> (/opt/homebrew/lib/node_modules/nodemon/lib/monitor/run.js:215:11)
+    at ChildProcess.emit (node:events:512:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12)[39m

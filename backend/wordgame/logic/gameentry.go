@@ -50,7 +50,23 @@ func GetGameEntryJson() (string, *httperrors.HttpError) {
 	return string(gameEntryBytes), nil
 }
 
-func correctAnswer(username string, word string) *httperrors.HttpError {
+func HandleAnswer(submission WordGameSubmission) *httperrors.HttpError {
+	if submission.IsAnswerCorrect {
+		httpErr := handleCorrectAnswer(submission.Username, submission.Word)
+		if httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		return nil
+	}
+
+	httpErr := handleIncorrectAnswer(submission.Username, submission.Word)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr) //todo: let WrapError handle nil errors so that you could just return httperrors.WrapError(httpErr)
+	}
+	return nil
+}
+
+func handleCorrectAnswer(username string, word string) *httperrors.HttpError {
 	rowExists, httpErr := dbwrappers.DoesRowExists(username, word)
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr)
@@ -73,7 +89,7 @@ func correctAnswer(username string, word string) *httperrors.HttpError {
 	return nil
 }
 
-func incorrectAnswer(username string, word string) *httperrors.HttpError {
+func handleIncorrectAnswer(username string, word string) *httperrors.HttpError {
 	rowExists, httpErr := dbwrappers.DoesRowExists(username, word)
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr)
@@ -88,7 +104,7 @@ func incorrectAnswer(username string, word string) *httperrors.HttpError {
 		return httperrors.WrapError(httpErr)
 	}
 
-	if currentCount <= 0 {
+	if currentCount <= 0 { //should be done by db contraints instead
 		return httperrors.NewHttp500Error(errors.New("current count cannot be equal to or less than 0"))
 	}
 	if currentCount == 1 {
@@ -102,9 +118,5 @@ func incorrectAnswer(username string, word string) *httperrors.HttpError {
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr)
 	}
-	return nil
-}
-
-func CheckSubmission(submission WordGameSubmission) *httperrors.HttpError {
 	return nil
 }

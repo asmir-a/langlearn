@@ -15,6 +15,7 @@ func SetUpDevRoutes(mux *http.ServeMux) {
 	if isDevEnv, err := strconv.Atoi(os.Getenv("DEVELOPMENT")); err != nil || isDevEnv != 1 {
 		return
 	}
+
 	frontendBuildDir := http.Dir("./../frontend/build")
 	fs := http.FileServer(frontendBuildDir)
 	mux.Handle("/", fs)

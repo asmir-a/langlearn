@@ -3,6 +3,7 @@ package dbwrappers
 import (
 	"context"
 	"math/rand"
+	"time"
 
 	"github.com/asmir-a/langlearn/backend/dbconnholder"
 	"github.com/asmir-a/langlearn/backend/httperrors"
@@ -13,6 +14,10 @@ const numberOfRandomWords = 4
 type WordWithDefs struct {
 	Word string
 	Defs []string
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }
 
 func ExtractWordsFromWordsWithDefs(wordsWithDefs []WordWithDefs) []string {

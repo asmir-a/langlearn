@@ -77,7 +77,7 @@ func DecrementCurrentCount(username string, word string) *httperrors.HttpError {
 
 func CreateNewRowInKnows(username string, word string) *httperrors.HttpError {
 	query := `
-		INSERT INTO knows(username, word, word_count) 
+		INSERT INTO knows(username, word, current_count) 
 		VALUES ($1, $2, $3)
 	`
 	if _, err := dbconnholder.Conn.Exec(context.Background(), query, username, word, 1); err != nil {

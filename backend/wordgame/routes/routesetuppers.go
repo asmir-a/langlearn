@@ -8,6 +8,10 @@ import (
 )
 
 func SetUpWordGameRoutes(mux *http.ServeMux) {
+	//todo: if there are too many route handles, they should prolly be put into a table
 	protectedGameEntryRandomRoute := authRoutes.CheckIfAuthed(httperrors.HandlerWithHttpError(handleGameEntriesRandom))
-	mux.Handle("/api/word-game/game-entries/random", protectedGameEntryRandomRoute)
+	mux.Handle("/api/wordgame/entries/random", protectedGameEntryRandomRoute)
+
+	protectedGameEntrySubmitRoute := authRoutes.CheckIfAuthed(httperrors.HandlerWithHttpError(handleGameEntriesSubmit))
+	mux.Handle("/api/wordgame/entries/submit", protectedGameEntrySubmitRoute)
 }

@@ -7,6 +7,7 @@ type WordGameEntry struct {
 }
 
 type WordGameSubmission struct {
+	Username        string `json:"username"`
 	IsAnswerCorrect bool   `json:"isAnswerCorrect"`
 	Word            string `json:"word"`
 }
