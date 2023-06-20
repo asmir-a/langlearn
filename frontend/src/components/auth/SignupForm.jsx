@@ -30,8 +30,13 @@ export default function SignupForm ({setAuthState}) {
             body: formData,
         });
 
-        if (response.status === common.HTTP_STATUS_OK) {
-            setAuthState(common.AUTH_STATE_ENUM.Authed);
+        if (response.status === common.HTTP_STATUS_OK) {//todo: you should not check for the status code everytime you make a request; actually, the login endpoint should return the userData
+            const response = await fetch("/api/is-authed");
+            const userData = await response.json();
+            setAuthInfo({
+                authState: common.AUTH_STATE_ENUM.Authed,
+                user: userData
+            })
             return;
         } else if (response.status === common.HTTP_STATUS_UNAUTHORIZED) {//todo: make the server return more information in www-unauthorized header or something like that
             setResponseError("provided username or password have an invalid format");

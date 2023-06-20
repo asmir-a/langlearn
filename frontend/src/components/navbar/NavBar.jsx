@@ -1,18 +1,24 @@
 import React from 'react';
 import * as common from '../../utilites';
 
-const LoginNavButton = ({setAuthState}) => {
+const LoginNavButton = ({setAuthInfo}) => {
     const handleClick = (_) => {
-        setAuthState(common.AUTH_STATE_ENUM.ShouldLogin);
+        setAuthInfo({
+            authState: common.AUTH_STATE_ENUM.ShouldLogin,
+            user: null
+        });
     }
     return (
         <button onClick={handleClick}>to login</button>
     );
 }
 
-const SignupNavButton = ({setAuthState}) => {
+const SignupNavButton = ({setAuthInfo}) => {
     const handleClick = (_) => {
-        setAuthState(common.AUTH_STATE_ENUM.ShouldSignup);
+        setAuthInfo({
+            authState: common.AUTH_STATE_ENUM.ShouldSignup,
+            user: null
+        });
     }
     return (
         <button onClick={handleClick}>to signup</button>
@@ -20,13 +26,18 @@ const SignupNavButton = ({setAuthState}) => {
 }
 
 const LOGOUT_ENDPOINT = "/api/logout";
-function LogoutNavButton({setAuthState}) {
+function LogoutNavButton({setAuthInfo}) {
     const handleClick = async (event) => {
         const response = await fetch(LOGOUT_ENDPOINT, {
             method: "POST",
         });
         if (response.status === common.HTTP_STATUS_OK) {
-            setAuthState(common.AUTH_STATE_ENUM.ShouldLogin);
+            const response = await fetch("/api/is-authed");
+            const userData = await response.json();
+            setAuthInfo({
+                authState: common.AUTH_STATE_ENUM.ShouldLogin,
+                user: userData
+            });
             return;
         } else {
             throw new Erorr("not implemented");
@@ -38,17 +49,17 @@ function LogoutNavButton({setAuthState}) {
     );
 }
 
-export default function NavBar({authState, setAuthState}) {
+export default function NavBar({authInfo, setAuthInfo}) {
     const selectAuthComponents = () => {
-        if (authState !== common.AUTH_STATE_ENUM.Authed) {
+        if (authInfo.authState !== common.AUTH_STATE_ENUM.Authed) {
             return (
                 <React.Fragment>
-                    <LoginNavButton setAuthState={setAuthState}/>
-                    <SignupNavButton setAuthState={setAuthState}/>
+                    <LoginNavButton setAuthState={setAuthInfo}/>
+                    <SignupNavButton setAuthState={setAuthInfo}/>
                 </React.Fragment>
             );
         } else {
-            return <LogoutNavButton setAuthState={setAuthState}/>;
+            return <LogoutNavButton setAuthState={setAuthInfo}/>;
         }
     }
     return (

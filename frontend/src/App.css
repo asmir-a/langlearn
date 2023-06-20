@@ -1,10 +1,13 @@
 :root {
-  --main-bg-color: #320033;
-  --main-font-color: #FFED23;
+  --main-body-bg-color: #320033;
+  --main-component-bg-color: white;
+  --hover-bg-color: #FFED23;
+
+  --main-font-color: #320033;
 }
 
 body {
-  background-color: var(--main-bg-color);
+  background-color: var(--main-body-bg-color);
   color: var(--main-font-color);
 }
 
@@ -20,7 +23,7 @@ form {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 40vw;
+  width: 30vw;
   height: 25vh;
   border: 1px solid white;
   border-radius: 5%;
@@ -30,24 +33,24 @@ form input {
   font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
-  background-color: white;
-  color: var(--main-bg-color);
+  background-color: var(--main-component-bg-color);
+  color: var(--main-font-color);
   width: 90%;
   height: 4vh;
   border: none;
-  border-radius: 3%;
+  border-radius: 5%;
   margin: 1vmin;
 }
 
 form input::placeholder {
-  color: var(--main-bg-color);
+  color: var(--main-font-color);
   opacity: 0.5;
   font-weight: thin;
 }
 
 form input[type="submit"] {
   width: 15vw;
-  background-color: white;
+  background-color: var(--main-component-bg-color);
   font-weight: bold;
 }
 
@@ -59,20 +62,20 @@ nav ul {
   display: flex;
   flex-direction: row;
   justify-content: right;
-  column-gap: 3vw;
+  margin-right: 3vw;
+  column-gap: 2vw;
 }
 
 nav ul button {
-  background-color: white;
+  background-color: var(--main-component-bg-color);
   color: var(--main-bg-color);
   border: none;
+  border-radius: 5%;
   text-decoration: none;
   font-weight: bold;
   width: 10vw;
   height: 4vh;
 }
-
-
 
 article.game-entry {
   display: flex;
@@ -86,7 +89,6 @@ article.game-entry img {
   object-fit: cover;
   border: 1px solid white;
 }
-
 
 article.game-entry div.button-group {
   display: grid;
@@ -102,7 +104,7 @@ article.game-entry div.button-group button {
   width: 20vw;
   font-size: 2em;
   font-weight: bold;
-  color: var(--main-bg-color);
+  color: var(--main-body-bg-color);
 }
 
 article.game-entry div.button-group button:hover {

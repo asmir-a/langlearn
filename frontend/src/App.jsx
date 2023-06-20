@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import WordsGame from './components/wordgame/ContentImagesGame';
+import WordsGame from './components/wordgame/WordsGame';
 import LoadingDisplay from './components/general/Loading';
 import AuthErrorDisplay from './components/general/AuthError';
 import NavBar from './components/navbar/NavBar';
@@ -10,13 +10,14 @@ import * as common from './utilites';
 import "./App.css";
 
 const IS_AUTHED_ENDPOINT = "/api/is-authed";
-const requestToCheckIfAuthed = async () => {
 
+const getCurrentUserInfo = async () => {
   const response = await fetch(IS_AUTHED_ENDPOINT);
   if (response.status === common.HTTP_STATUS_OK) {//todo:handle other status codes
-    return true;
+    const user = await response.json();
+    return user;
   } else if (response.status === common.HTTP_STATUS_UNAUTHORIZED) {
-    return false;
+    return null;
   } else {
     //todo: handle later
     throw new Error("not implemented");
@@ -24,17 +25,27 @@ const requestToCheckIfAuthed = async () => {
 }
 
 const App = () => {
-  const [authState, setAuthState] = useState(common.AUTH_STATE_ENUM.Loading);
+  const [authInfo, setAuthInfo] = useState(
+    {
+      authState: common.AUTH_STATE_ENUM.Loading,
+      user: null,
+    }
+  );
   
   useEffect(() => {
     const wrapperAroundAuthLogic = async () => {
-      const isAuthedResponse = await requestToCheckIfAuthed();
-
-      if (isAuthedResponse) {
-        setAuthState(common.AUTH_STATE_ENUM.Authed);
+      const userJson = await getCurrentUserInfo();
+      if (userJson) {
+        setAuthInfo({
+          authState: common.AUTH_STATE_ENUM.Authed,
+          user: userData
+        });
         return;
       } else {
-        setAuthState(common.AUTH_STATE_ENUM.ShouldLogin)//might be login, which depends on some further logic like sessionstorage, but for now it is okay
+        setAuthInfo({
+          authState: common.AUTH_STATE_ENUM.ShouldLogin,
+          user: null
+        });
         return;
       }
     }
@@ -42,27 +53,23 @@ const App = () => {
   }, []);
 
   const selectComponent = () => {
-    switch (authState) {
+    switch (authInfo.authState) {
       case common.AUTH_STATE_ENUM.Loading:
         return <LoadingDisplay />//todo: can this be put into a closure somehow
-
       case common.AUTH_STATE_ENUM.Authed:
-        return <WordsGame setAuthState = {setAuthState}/>
-
+        return <WordsGame username = {authInfo.user.username} setAuthInfo = {setAuthInfo}/>
       case common.AUTH_STATE_ENUM.ShouldSignup:
-        return <SignupForm setAuthState = {setAuthState}/>
-
+        return <SignupForm setAuthInfo = {setAuthInfo}/>
       case common.AUTH_STATE_ENUM.ShouldLogin:
-        return <LoginForm setAuthState = {setAuthState}/>
-
+        return <LoginForm setAuthInfo = {setAuthInfo}/>
       default:
-        return <AuthErrorDisplay setAuthState = {setAuthState}/>
+        throw new Error("not implemented")
     }
   }
 
   return (
     <div id="app">
-      <NavBar authState={authState} setAuthState={setAuthState}/>
+      <NavBar authInfo={authInfo} setAuthInfo={setAuthInfo}/>
       {selectComponent()}
     </div>
   );

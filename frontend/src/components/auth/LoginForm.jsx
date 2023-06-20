@@ -4,7 +4,7 @@ import * as common from "../../utilites";
 
 const loginEndpoint = "/api/login";
 
-export default function LoginForm ({setAuthState}) {
+export default function LoginForm ({setAuthInfo}) {
     const [responseError, setResponseError] = useState(null);
 
     const [username, setUsername] = useState("");
@@ -33,7 +33,12 @@ export default function LoginForm ({setAuthState}) {
         });
 
         if (response.status === 200) {
-            setAuthState(common.AUTH_STATE_ENUM.Authed);
+            const response = await fetch("/api/is-authed");
+            const userData = await response.json();
+            setAuthInfo({
+                authState: common.AUTH_STATE_ENUM.Authed,
+                user: userData
+            });
             return;
         } else if (response.status == common.HTTP_STATUS_UNAUTHORIZED) {
             setResponseError("wrong login or password")
