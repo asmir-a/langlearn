@@ -38,7 +38,7 @@ func getMaxIndex() (int, *httperrors.HttpError) {
 	if err := row.Scan(&maxIndexDb); err != nil {
 		return 0, httperrors.NewHttp500Error(err)
 	}
-	return maxIndexDb, nil
+	return maxIndexDb / 50, nil
 }
 
 func GetRandomKoreanWords() ([]WordWithDefs, *httperrors.HttpError) {
@@ -53,10 +53,15 @@ func GetRandomKoreanWords() ([]WordWithDefs, *httperrors.HttpError) {
 		return []WordWithDefs{}, httperrors.WrapError(httpErr)
 	}
 
-	randomIndices := []int{}
-	for i := 0; i < numberOfRandomWords; i++ {
+	randomIndicesSet := make(map[int]bool)
+	for len(randomIndicesSet) != 4 {
 		randomIndex := rand.Intn(maxIndex)
-		randomIndices = append(randomIndices, randomIndex)
+		randomIndicesSet[randomIndex] = true
+	}
+
+	randomIndices := make([]int, 0)
+	for key := range randomIndicesSet {
+		randomIndices = append(randomIndices, key)
 	}
 
 	wordRows, err := dbconnholder.Conn.Query(context.Background(), query, randomIndices)

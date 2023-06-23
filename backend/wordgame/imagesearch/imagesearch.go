@@ -2,6 +2,7 @@ package imagesearch
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -73,6 +74,7 @@ func fetchResponseItemsFor(query string) (googleImageSearchResponseItems, *httpe
 	if httpErr != nil {
 		return googleImageSearchResponseItems{}, httperrors.WrapError(httpErr)
 	}
+
 	return responseData, nil
 }
 
@@ -80,6 +82,9 @@ func FetchImageUrlFor(query string) (string, *httperrors.HttpError) {
 	responseItems, httpErr := fetchResponseItemsFor(query)
 	if httpErr != nil {
 		return "", httperrors.WrapError(httpErr)
+	}
+	if len(responseItems.Items) == 0 {
+		httperrors.Fatal(errors.New("[potential issue: engine quota exceeded]"))
 	}
 	return responseItems.Items[0].Link, nil
 }

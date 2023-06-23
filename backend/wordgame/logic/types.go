@@ -11,3 +11,7 @@ type WordGameSubmission struct {
 	IsAnswerCorrect bool   `json:"isAnswerCorrect"`
 	Word            string `json:"word"`
 }
+
+type WordGameUserInfo struct {
+	Username string `json:"username"`
+}

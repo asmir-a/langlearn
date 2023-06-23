@@ -44,6 +44,7 @@ func handleLogin(w http.ResponseWriter, req *http.Request) *httperrors.HttpError
 
 	authCookie := &http.Cookie{Name: "session_key", Value: sessionKey, Path: "/", HttpOnly: true}
 	http.SetCookie(w, authCookie)
+
 	w.Write([]byte(""))
 	return nil
 }

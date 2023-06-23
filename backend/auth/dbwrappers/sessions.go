@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/asmir-a/langlearn/backend/dbconnholder"
@@ -70,6 +71,21 @@ func CheckIfSessionExistsFor(username string) (bool, *httperrors.HttpError) {
 	} else {
 		return false, httperrors.NewHttp500Error(err)
 	}
+}
+
+func GetSessionFor(username string) (string, *httperrors.HttpError) {
+	query := `
+		SELECT session_key
+		FROM sessions
+		WHERE username = $1
+	`
+	var sessionKey string
+	if err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&sessionKey); err == pgx.ErrNoRows { //if session does not exist, it returns pgx.NoRowErr, but it is okay cause the absence of session still means that the session is invalid
+		return "", httperrors.NewHttpError(err, http.StatusUnauthorized, "please login first")
+	} else if err != nil {
+		return "", httperrors.NewHttp500Error(err)
+	}
+	return sessionKey, nil
 }
 
 func DeleteSession(sessionKey string) *httperrors.HttpError {
@@ -150,17 +166,18 @@ func CheckIfSessionIsValid(sessionKey string) (bool, *httperrors.HttpError) {
 	return true, nil
 }
 
-func GetUserWith(session_key string) (*User, *httperrors.HttpError) {
+func GetUserWith(session_key string) (User, *httperrors.HttpError) {
 	query := `
 		SELECT username
 		FROM sessions
-		where session_key = $1
+		WHERE session_key = $1
 	`
 
 	var username string
 	if err := dbconnholder.Conn.QueryRow(context.Background(), query, session_key).Scan(&username); err != nil {
-		return nil, httperrors.NewHttp500Error(err)
+		log.Println(err)
+		return User{}, httperrors.NewHttp500Error(err)
 	}
 
-	return &User{username}, nil //for now, it is enough to use just the username, but in the future, the whole user struct might be more useful
+	return User{username}, nil //for now, it is enough to use just the username, but in the future, the whole user struct might be more useful
 }

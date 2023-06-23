@@ -37,3 +37,20 @@ func handleGameEntriesSubmit(w http.ResponseWriter, req *http.Request) *httperro
 	}
 	return nil
 }
+
+func extractUserInfoFromRequest(req *http.Request) (logic.WordGameUserInfo, *httperrors.HttpError) {
+	decoder := json.NewDecoder(req.Body)
+	var userInfo logic.WordGameUserInfo
+	if err := decoder.Decode(&userInfo); err != nil {
+		return logic.WordGameUserInfo{}, httperrors.NewHttp500Error(err)
+	}
+	return userInfo, nil
+}
+
+func handleGameUsers(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
+	_, httpErr := extractUserInfoFromRequest(req)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	return nil
+}
