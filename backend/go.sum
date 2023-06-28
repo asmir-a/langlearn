@@ -1,3 +1,5 @@
+github.com/asmir-a/gorestrouter v0.0.2 h1:Kz4+cwYhgXvcrlCPXPKSrvORxfoKPfke1Yp5Tr5rgr0=
+github.com/asmir-a/gorestrouter v0.0.2/go.mod h1:AurCKatGbxFC+KtPPY3Qi5yq0mqY63VPfzGfLneiXio=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=

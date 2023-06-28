@@ -5,7 +5,6 @@ import (
 
 	authRoutes "github.com/asmir-a/langlearn/backend/auth/routes"
 	"github.com/asmir-a/langlearn/backend/httperrors"
-	"github.com/asmir-a/langlearn/backend/wordgame/routes/users"
 )
 
 func SetUpWordGameRoutes(mux *http.ServeMux) {
@@ -15,6 +14,4 @@ func SetUpWordGameRoutes(mux *http.ServeMux) {
 
 	protectedGameEntrySubmitRoute := authRoutes.CheckIfAuthenticated(httperrors.HandlerWithHttpError(handleGameEntriesSubmit))
 	mux.Handle("/api/wordgame/entries/submit", protectedGameEntrySubmitRoute)
-
-	users.SetUpUsersWordsGameRoutes(mux)
 }

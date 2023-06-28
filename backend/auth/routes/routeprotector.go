@@ -1,75 +1,104 @@
 package routes
 
 import (
-	"fmt"
-	"log"
+	"errors"
 	"net/http"
 
 	"github.com/asmir-a/langlearn/backend/auth/dbwrappers"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
-func CheckIfAuthenticated(handler http.Handler) http.Handler { //todo: this might not belong to this package;
-	newFunc := func(w http.ResponseWriter, req *http.Request) {
+//todo big: the auth handling should be user friendly. We first should try to extract the session from the request, and then based on the session present, determine what the error message should be
+//todo: consider if the routes with users/username should be authorized using regex like `.*/users/username/.*` this way we can handle the authorization part before the routing logic begins to run
+
+func CheckIfAuthenticated(currentHandler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError { //todo: needs splitting to other functions
+	authenticatedHandler := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
 		sessionCookie, err := req.Cookie("session_key")
 		if err == http.ErrNoCookie {
-			http.Error(w, "need valid credentials", http.StatusUnauthorized)
-			return
+			return httperrors.NewHttpError(
+				errors.New("no session cookie was provided"),
+				http.StatusUnauthorized,
+				"please login",
+			)
 		} else if err != nil {
-			http.Error(w, "something went wrong verifying credentials", http.StatusInternalServerError)
-			return
+			return httperrors.NewHttp500Error(err)
 		}
 
 		if sessionCookie.Value == "" { //todo: it might be needed to have a session validation function for the session format, eg
-			http.Error(w, "invalid credentials", http.StatusUnauthorized)
-			return
+			return httperrors.NewHttpError(
+				errors.New("session cookie is an empty string"),
+				http.StatusUnauthorized,
+				"please login",
+			)
 		}
 
 		sessionIsValid, httpErr := dbwrappers.CheckIfSessionIsValid(sessionCookie.Value)
 		if httpErr != nil {
-			log.Fatal(err)
-			http.Error(w, "something went wrong verifying credentials", http.StatusInternalServerError)
-			return
+			return httperrors.WrapError(httpErr)
 		}
 		if !sessionIsValid {
-			http.Error(w, "credentials are invalid", http.StatusUnauthorized)
-			return
+			return httperrors.NewHttpError(
+				errors.New("the session is invalid"),
+				http.StatusUnauthorized,
+				"please login",
+			)
 		}
 
-		handler.ServeHTTP(w, req)
-		return
+		if httpErr = currentHandler(w, req); httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		return nil
 	}
-	return http.HandlerFunc(newFunc)
+	return httperrors.HandlerWithHttpError(authenticatedHandler)
 }
 
-func CheckIfAuthorized(username string, handler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError {
+func CheckIfAuthorized(username string, currentHandler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError {
 	authorizedHandler := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
-		sessionCookie, err := req.Cookie("session_key")
+		sessionCookie, err := req.Cookie("session_key") //todo: this logic is duplicated in this function and in the previous function
 		if err == http.ErrNoCookie {
-			http.Error(w, "please login", http.StatusUnauthorized)
-			return nil
+			return httperrors.NewHttpError(
+				errors.New("no session cookie"),
+				http.StatusUnauthorized,
+				"please login",
+			)
 		} else if err != nil {
-			http.Error(w, "something went wrong reading credentials", http.StatusInternalServerError)
-			return nil
+			return httperrors.NewHttp500Error(err)
 		}
 		if sessionCookie.Value == "" {
-			http.Error(w, "invalid credentials", http.StatusUnauthorized)
-			return nil
+			return httperrors.NewHttpError(
+				errors.New("session is an empty string"),
+				http.StatusUnauthorized,
+				"please login",
+			)
 		}
 
 		sessionInDb, httpErr := dbwrappers.GetSessionFor(username) //and check if it valid
 		if httpErr != nil {
-			fmt.Println("the err: ", httpErr)
-			http.Error(w, "something went wrong", http.StatusInternalServerError) //fix this tomorrow: now we cannot send the right httperr to the client, this middleware should return httperrors.HandlerWithHttpError
-			return nil
+			return httperrors.WrapError(httpErr)
 		}
 
 		if sessionInDb != sessionCookie.Value {
-			http.Error(w, "acces denied", http.StatusForbidden)
-			return nil
+			return httperrors.NewHttpError(errors.New(
+				"db session does not match the cookie session"),
+				http.StatusForbidden,
+				"you cannot access another person's stats",
+			)
 		}
 
-		handler.ServeHTTP(w, req)
+		if sessionIsValid, httpErr := dbwrappers.CheckIfSessionIsValid(sessionCookie.Value); httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		} else if !sessionIsValid {
+			return httperrors.NewHttpError(
+				errors.New("session in cookie is invalid"),
+				http.StatusUnauthorized,
+				"please login",
+			)
+		}
+
+		if httpErr = currentHandler(w, req); httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+
 		return nil
 	}
 	return httperrors.HandlerWithHttpError(authorizedHandler)

@@ -80,8 +80,16 @@ func GetSessionFor(username string) (string, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var sessionKey string
-	if err := dbconnholder.Conn.QueryRow(context.Background(), query, username).Scan(&sessionKey); err == pgx.ErrNoRows { //if session does not exist, it returns pgx.NoRowErr, but it is okay cause the absence of session still means that the session is invalid
-		return "", httperrors.NewHttpError(err, http.StatusUnauthorized, "please login first")
+	if err := dbconnholder.Conn.QueryRow(
+		context.Background(),
+		query,
+		username,
+	).Scan(&sessionKey); err == pgx.ErrNoRows { //if session does not exist, it returns pgx.NoRowErr, but it is okay cause the absence of session still means that the session is invalid
+		return "", httperrors.NewHttpError(
+			err,
+			http.StatusUnauthorized,
+			"please login first",
+		)
 	} else if err != nil {
 		return "", httperrors.NewHttp500Error(err)
 	}
@@ -125,7 +133,11 @@ func checkIfSessionExists(session_key string) (bool, *httperrors.HttpError) {
 		WHERE session_key = $1
 	`
 	var sessionKeyDb string
-	err := dbconnholder.Conn.QueryRow(context.Background(), query, session_key).Scan(&sessionKeyDb)
+	err := dbconnholder.Conn.QueryRow(
+		context.Background(),
+		query,
+		session_key,
+	).Scan(&sessionKeyDb)
 
 	if err == nil {
 		return true, nil
