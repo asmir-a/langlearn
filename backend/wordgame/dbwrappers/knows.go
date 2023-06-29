@@ -124,8 +124,54 @@ func GetWordsLearningCount(username string) (int, *httperrors.HttpError) {
 	return count, nil
 }
 
-func GetLearnedWords(username string) {
+func SelectWordsLearnedFor(username string) ([]string, *httperrors.HttpError) {
+	query := `
+		SELECT word
+		FROM knows
+		WHERE username = $1 AND current_count > 3
+	`
+	rows, err := db.Conn.Query(context.Background(), query, username)
+	if err != nil {
+		return nil, httperrors.NewHttp500Error(err)
+	}
+	defer rows.Close()
+
+	wordsLearned := []string{} //should this function, for example, have access to the words struct?
+	for rows.Next() {
+		var wordLearned string
+		err = rows.Scan(&wordLearned)
+		if err != nil {
+			return nil, httperrors.NewHttp500Error(err)
+		}
+		wordsLearned = append(wordsLearned, wordLearned)
+	}
+	if rows.Err() != nil {
+		return nil, httperrors.NewHttp500Error(err)
+	}
+	return wordsLearned, nil
 }
 
-func GetLearningWords(username string) {
+func SelectWordsLearningFor(username string) ([]string, *httperrors.HttpError) {
+	query := `
+		SELECT word
+		FROM knows
+		WHERE username = $1 AND current_count <= 3
+	`
+	rows, err := db.Conn.Query(context.Background(), query, username)
+	if err != nil {
+		return nil, httperrors.NewHttp500Error(err)
+	}
+	defer rows.Close()
+
+	wordsLearning := []string{}
+	for rows.Next() {
+		var wordLearning string
+		err = rows.Scan(&wordLearning)
+		if err != nil {
+			return nil, httperrors.NewHttp500Error(err)
+		}
+		wordsLearning = append(wordsLearning, wordLearning)
+	}
+
+	return wordsLearning, nil
 }

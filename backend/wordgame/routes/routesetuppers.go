@@ -15,4 +15,6 @@ func SetUpWordGameRoutes(mux *http.ServeMux) {
 	protectedGameEntrySubmitRoute := authRoutes.CheckIfAuthenticated(httperrors.HandlerWithHttpError(handleGameEntriesSubmit))
 	mux.Handle("/api/wordgame/entries/submit", protectedGameEntrySubmitRoute)
 
+	usersRouter := NewUsersRouter()
+	mux.Handle("/api/users/", http.StripPrefix("/api/users/", usersRouter))
 }
