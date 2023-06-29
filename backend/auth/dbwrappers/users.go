@@ -3,7 +3,7 @@ package dbwrappers
 import (
 	"context"
 
-	"github.com/asmir-a/langlearn/backend/dbconnholder"
+	"github.com/asmir-a/langlearn/backend/db"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/jackc/pgx/v5"
 )
@@ -13,7 +13,7 @@ func InsertUser(username string, passwordHash string, passwordSalt string) *http
 		INSERT INTO users (username, password_hash, password_salt)
 		VALUES ($1, $2, $3)
 	`
-	if _, err := dbconnholder.Conn.Exec(
+	if _, err := db.Conn.Exec(
 		context.Background(),
 		query,
 		username,
@@ -32,7 +32,7 @@ func CheckIfUserExists(username string) (bool, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var usernameDB string
-	err := dbconnholder.Conn.QueryRow(
+	err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		username,
@@ -54,7 +54,7 @@ func GetUserPasswordHash(username string) (string, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var passwordHashDB string
-	if err := dbconnholder.Conn.QueryRow(
+	if err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		username,
@@ -72,7 +72,7 @@ func GetUserPasswordSalt(username string) (string, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var passwordSaltDB string
-	if err := dbconnholder.Conn.QueryRow(
+	if err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		username,

@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/asmir-a/langlearn/backend/dbconnholder"
+	"github.com/asmir-a/langlearn/backend/db"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
@@ -33,7 +33,7 @@ func getMaxIndex() (int, *httperrors.HttpError) {
 		SELECT max(index) 
 		FROM korean_words
 	`
-	row := dbconnholder.Conn.QueryRow(context.Background(), query)
+	row := db.Conn.QueryRow(context.Background(), query)
 	var maxIndexDb int
 	if err := row.Scan(&maxIndexDb); err != nil {
 		return 0, httperrors.NewHttp500Error(err)
@@ -64,7 +64,7 @@ func GetRandomKoreanWords() ([]WordWithDefs, *httperrors.HttpError) {
 		randomIndices = append(randomIndices, key)
 	}
 
-	wordRows, err := dbconnholder.Conn.Query(context.Background(), query, randomIndices)
+	wordRows, err := db.Conn.Query(context.Background(), query, randomIndices)
 	if err != nil {
 		return []WordWithDefs{}, httperrors.NewHttp500Error(err)
 	}

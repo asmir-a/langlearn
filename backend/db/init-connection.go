@@ -1,4 +1,4 @@
-package dbconnholder
+package db
 
 import (
 	"context"

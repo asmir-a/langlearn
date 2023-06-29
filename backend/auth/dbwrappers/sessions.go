@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asmir-a/langlearn/backend/dbconnholder"
+	"github.com/asmir-a/langlearn/backend/db"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/jackc/pgx/v5"
 )
@@ -34,7 +34,7 @@ func CreateSessionFor(username string) (string, *httperrors.HttpError) {
 	newSessionKey := generateSessionKey(username)
 	loginTime := time.Now()
 	lastSeenTime := time.Now()
-	if _, err := dbconnholder.Conn.Exec(
+	if _, err := db.Conn.Exec(
 		context.Background(),
 		query,
 		newSessionKey,
@@ -63,7 +63,7 @@ func CheckIfSessionExistsFor(username string) (bool, *httperrors.HttpError) {
 		SELECT * FROM sessions
 		WHERE username = $1
 	`
-	_, err := dbconnholder.Conn.Exec(context.Background(), query, username)
+	_, err := db.Conn.Exec(context.Background(), query, username)
 	if err == nil {
 		return true, nil
 	} else if err == pgx.ErrNoRows {
@@ -80,7 +80,7 @@ func GetSessionFor(username string) (string, *httperrors.HttpError) {
 		WHERE username = $1
 	`
 	var sessionKey string
-	if err := dbconnholder.Conn.QueryRow(
+	if err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		username,
@@ -101,7 +101,7 @@ func DeleteSession(sessionKey string) *httperrors.HttpError {
 		DELETE FROM sessions
 		WHERE session_key = $1
 	`
-	if _, err := dbconnholder.Conn.Exec(
+	if _, err := db.Conn.Exec(
 		context.Background(),
 		query,
 		sessionKey,
@@ -116,7 +116,7 @@ func DeleteSessionFor(username string) *httperrors.HttpError {
 		DELETE FROM sessions
 		WHERE username = $1
 	`
-	if _, err := dbconnholder.Conn.Exec(
+	if _, err := db.Conn.Exec(
 		context.Background(),
 		query,
 		username,
@@ -133,7 +133,7 @@ func checkIfSessionExists(session_key string) (bool, *httperrors.HttpError) {
 		WHERE session_key = $1
 	`
 	var sessionKeyDb string
-	err := dbconnholder.Conn.QueryRow(
+	err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		session_key,
@@ -162,7 +162,7 @@ func CheckIfSessionIsValid(sessionKey string) (bool, *httperrors.HttpError) {
 		WHERE session_key = $1
 	`
 	var loginTime, lastSeenTime time.Time
-	if err := dbconnholder.Conn.QueryRow(
+	if err := db.Conn.QueryRow(
 		context.Background(),
 		query,
 		sessionKey,
@@ -186,7 +186,7 @@ func GetUserWith(session_key string) (User, *httperrors.HttpError) {
 	`
 
 	var username string
-	if err := dbconnholder.Conn.QueryRow(context.Background(), query, session_key).Scan(&username); err != nil {
+	if err := db.Conn.QueryRow(context.Background(), query, session_key).Scan(&username); err != nil {
 		log.Println(err)
 		return User{}, httperrors.NewHttp500Error(err)
 	}
