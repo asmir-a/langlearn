@@ -1,11 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import WordsGame from './components/wordgame/WordsGame';
 import LoadingDisplay from './components/general/Loading';
 import AuthErrorDisplay from './components/general/AuthError';
 import NavBar from './components/navbar/NavBar';
 import LoginForm from './components/auth/LoginForm';
 import SignupForm from './components/auth/SignupForm';
+import * as componentSelector from './components/mainlogic/ComponentSelector';
+
 import * as common from './utilites';
 import "./App.css";
 
@@ -31,14 +32,16 @@ const App = () => {
       user: null,
     }
   );
+
+  const [whichPageToShow, setWhichPageToShow] = useState(componentSelector.pagesEnum.none)
   
   useEffect(() => {
     const wrapperAroundAuthLogic = async () => {
-      const userJson = await getCurrentUserInfo();
-      if (userJson) {
+      const user = await getCurrentUserInfo();
+      if (user) {
         setAuthInfo({
           authState: common.AUTH_STATE_ENUM.Authed,
-          user: userData
+          user: user
         });
         return;
       } else {
@@ -57,7 +60,7 @@ const App = () => {
       case common.AUTH_STATE_ENUM.Loading:
         return <LoadingDisplay />//todo: can this be put into a closure somehow
       case common.AUTH_STATE_ENUM.Authed:
-        return <WordsGame username = {authInfo.user.username} setAuthInfo = {setAuthInfo}/>
+        return componentSelector.componentSelector(whichPageToShow, authInfo.username, setAuthInfo)
       case common.AUTH_STATE_ENUM.ShouldSignup:
         return <SignupForm setAuthInfo = {setAuthInfo}/>
       case common.AUTH_STATE_ENUM.ShouldLogin:
@@ -69,7 +72,7 @@ const App = () => {
 
   return (
     <div id="app">
-      <NavBar authInfo={authInfo} setAuthInfo={setAuthInfo}/>
+      <NavBar authInfo={authInfo} setAuthInfo={setAuthInfo} setPage={setWhichPageToShow}/>
       {selectComponent()}
     </div>
   );

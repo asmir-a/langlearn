@@ -1,5 +1,6 @@
 import React from 'react';
 import * as common from '../../utilites';
+import * as componentSelector from './../mainlogic/ComponentSelector';
 
 const LoginNavButton = ({setAuthInfo}) => {
     const handleClick = (_) => {
@@ -49,17 +50,27 @@ function LogoutNavButton({setAuthInfo}) {
     );
 }
 
-export default function NavBar({authInfo, setAuthInfo}) {
+function StatsNavButton({setPage}) {
+    const handleClick = async (event) => {
+        setPage(componentSelector.pagesEnum.stats)
+    }
+    return (
+        <button onClick={handleClick}>stats</button>
+    )
+}
+
+export default function NavBar({authInfo, setAuthInfo, setPage}) {
     const selectAuthComponents = () => {
         if (authInfo.authState !== common.AUTH_STATE_ENUM.Authed) {
             return (
                 <React.Fragment>
-                    <LoginNavButton setAuthState={setAuthInfo}/>
-                    <SignupNavButton setAuthState={setAuthInfo}/>
+                    <StatsNavButton setPage={setPage} />
+                    <LoginNavButton setAuthInfo={setAuthInfo} />
+                    <SignupNavButton setAuthInfo={setAuthInfo} />
                 </React.Fragment>
             );
         } else {
-            return <LogoutNavButton setAuthState={setAuthInfo}/>;
+            return <LogoutNavButton setAuthInfo={setAuthInfo}/>;
         }
     }
     return (

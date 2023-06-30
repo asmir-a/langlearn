@@ -108,7 +108,7 @@ article.game-entry div.button-group button {
 }
 
 article.game-entry div.button-group button:hover {
-  background-color: var(--main-font-color);
+  background-color: var(--hover-bg-color);
 }
 
 
