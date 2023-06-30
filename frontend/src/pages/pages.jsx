@@ -12,5 +12,3 @@ export const selectPageComponent = (whichPage) => {
             throw new Error("not handled; whichPage: ", whichPage)
     }
 }
-
-

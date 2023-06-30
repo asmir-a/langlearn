@@ -7,7 +7,7 @@ export const authStateEnum = {
 }
 
 export const selectAuthComponent = (authState) => {
-    switch (authState) {
+    switch (authState.state) {
         case authStateEnum.shouldLogin:
         case authStateEnum.shouldSignup:
         case authStateEnum.authed:

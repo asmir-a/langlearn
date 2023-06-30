@@ -14,7 +14,7 @@ const getNavbarButtonsWhenNotAuthed = (authState) => {
         authButtons: [],
         pageButtons: [],
     };
-    switch (authState) {
+    switch (authState.state) {
         case authStateEnum.shouldLogin:
             buttons.authButtons.push(SignupButton);
             break;
@@ -24,7 +24,7 @@ const getNavbarButtonsWhenNotAuthed = (authState) => {
         case authStateEnum.authed:
             throw new Error("the state is not supposed to be authed")
         default:
-            throw new Error("not handled; authState: ", authState)
+            throw new Error("not handled; authState: ", authState.state)
     }
     return buttons;
 }
@@ -48,7 +48,7 @@ const getNavbarButtonsWhenAuthed = (whichPage) => {
 }
 
 export const getNavbarButtons = (authState, whichPage) => {
-    if (authState !== authStateEnum.authed) {
+    if (authState.state !== authStateEnum.authed) {
         return getNavbarButtonsWhenNotAuthed(authState);
     } else {
         return getNavbarButtonsWhenAuthed(whichPage);

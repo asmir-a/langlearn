@@ -8,7 +8,9 @@ const LogoutButton = ({ setAuthState }) => {
     const handleClick = async (_) => {
         const responseToLogout = await axios.post(endpoints.logout);
         if (responseToLogout.status === httpCodes.ok) {
-            setAuthState(authStateEnum.shouldLogin)
+            setAuthState(prev => {
+                return { ...prev, state: authStateEnum.shouldLogin }
+            })
         } else {
             throw new Error(
                 "not implemented; status code from response: ",
