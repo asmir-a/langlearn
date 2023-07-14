@@ -5,7 +5,7 @@ FROM golang:1.20-alpine AS build-stage
 WORKDIR /backend
 COPY go.mod go.sum ./
 RUN go mod download
-COPY *.go ./
+COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /webserver # CGO_ENABLED: makes the binary statically-linked, GOOS: specifies the OS to build for
 
 #minimize image
