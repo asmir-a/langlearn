@@ -49,7 +49,7 @@ func handleLogin(w http.ResponseWriter, req *http.Request) *httperrors.HttpError
 	return nil
 }
 
-func handleIsAuthed(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
+func handleUser(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
 	cookie, err := req.Cookie("session_key")
 	if err == http.ErrNoCookie {
 		return httperrors.NewHttpError(
@@ -65,7 +65,7 @@ func handleIsAuthed(w http.ResponseWriter, req *http.Request) *httperrors.HttpEr
 		return httperrors.NewHttpError(
 			errors.New("empty string in cookie"),
 			http.StatusUnauthorized,
-			"something went wrong",
+			"Please Login",
 		)
 	}
 

@@ -1,0 +1,41 @@
+.quiz {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90%;
+}
+
+article.quiz h1 {
+    margin: 0;
+}
+
+article.quiz figure {
+    width: 100%;
+    height: 80%;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+article.quiz figure img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-width: 0;/*by default, it is auto which makes the image's initial size the min size of the grid item*/
+    min-height: 0;
+}
+
+article.quiz section {
+    height: 20%;
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+article.quiz section button {
+    width: 100%;
+    height: 100%;
+}

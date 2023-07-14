@@ -2,19 +2,14 @@ package routes
 
 import (
 	"net/http"
-
-	authRoutes "github.com/asmir-a/langlearn/backend/auth/routes"
-	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
 func SetUpWordGameRoutes(mux *http.ServeMux) {
 	//todo: if there are too many route handles, they should prolly be put into a table
-	protectedGameEntryRandomRoute := authRoutes.CheckIfAuthenticated(httperrors.HandlerWithHttpError(handleGameEntriesRandom))
-	mux.Handle("/api/wordgame/entries/random", protectedGameEntryRandomRoute)
+	// protectedGameEntryRandomRoute := authRoutes.CheckIfAuthenticated(httperrors.HandlerWithHttpError(handleGameEntriesRandom))
+	routerGameEntries := NewGameEntriesRouter()
+	mux.Handle("/api/wordgame/entries/", http.StripPrefix("/api/wordgame/entries/", routerGameEntries)) //random should be a parameter to this endpoint
 
-	protectedGameEntrySubmitRoute := authRoutes.CheckIfAuthenticated(httperrors.HandlerWithHttpError(handleGameEntriesSubmit))
-	mux.Handle("/api/wordgame/entries/submit", protectedGameEntrySubmitRoute)
-
-	usersRouter := NewUsersRouter()
-	mux.Handle("/api/users/", http.StripPrefix("/api/users/", usersRouter))
+	knowsRouter := NewKnowsRouter()
+	mux.Handle("/api/wordgame/users/", http.StripPrefix("/api/wordgame/users/", knowsRouter)) //should be knows
 }

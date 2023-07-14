@@ -1,8 +1,8 @@
 import pandas as pd
 from dataclasses import make_dataclass
 
-from extract_freq_info import extract_freq_info
-from extract_word_info import extract_word_info
+from datatransforms.extract_freq_info import extract_freq_info
+from datatransforms.extract_word_info import extract_word_info
 
 WordInfo = make_dataclass(
         "WordInfo", 

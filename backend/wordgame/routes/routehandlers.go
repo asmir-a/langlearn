@@ -4,18 +4,33 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/asmir-a/gorestrouter"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/asmir-a/langlearn/backend/wordgame/logic"
 )
 
-func handleGameEntriesRandom(w http.ResponseWriter, _ *http.Request) *httperrors.HttpError {
-	gameEntryJson, httpErr := logic.GetGameEntry()
-	if httpErr != nil {
-		return httperrors.WrapError(httpErr)
+func NewGameEntriesRouter() *gorestrouter.Router {
+	router := gorestrouter.Router{}
+
+	//the authentication and authorization logic should be handled somewhere here probably
+	router.Handle("/users/[username]/random", handlerBuilderGameEntriesRandom)
+	router.Handle("/users/[username]/submit", handlerBuilderGameEntriesSubmit)
+
+	return &router
+}
+
+func handlerBuilderGameEntriesRandom(params map[string]string) http.Handler {
+	username := params["username"]
+	handlerGameEntries := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
+		gameEntryJson, httpErr := logic.GetGameEntry(username)
+		if httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(gameEntryJson))
+		return nil
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(gameEntryJson))
-	return nil
+	return httperrors.HandlerWithHttpError(handlerGameEntries)
 }
 
 func extractSubmissionFromRequest(req *http.Request) (logic.WordGameSubmission, *httperrors.HttpError) {
@@ -27,13 +42,17 @@ func extractSubmissionFromRequest(req *http.Request) (logic.WordGameSubmission, 
 	return submission, nil
 }
 
-func handleGameEntriesSubmit(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
-	submission, httpErr := extractSubmissionFromRequest(req)
-	if httpErr != nil {
-		return httperrors.WrapError(httpErr)
+func handlerBuilderGameEntriesSubmit(params map[string]string) http.Handler {
+	username := params["username"]
+	handlerGameEntriesSubmit := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
+		submission, httpErr := extractSubmissionFromRequest(req)
+		if httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		if httpErr = logic.HandleAnswer(username, submission); httpErr != nil {
+			return httperrors.WrapError(httpErr)
+		}
+		return nil
 	}
-	if httpErr = logic.HandleAnswer(submission); httpErr != nil {
-		return httperrors.WrapError(httpErr)
-	}
-	return nil
+	return httperrors.HandlerWithHttpError(handlerGameEntriesSubmit)
 }

@@ -8,7 +8,6 @@ import (
 )
 
 type WordGameSubmission struct {
-	Username        string `json:"username"`
 	IsAnswerCorrect bool   `json:"isAnswerCorrect"`
 	Word            string `json:"word"`
 }
@@ -68,16 +67,16 @@ func handleIncorrectAnswer(username string, word string) *httperrors.HttpError {
 	return nil
 }
 
-func HandleAnswer(submission WordGameSubmission) *httperrors.HttpError {
+func HandleAnswer(username string, submission WordGameSubmission) *httperrors.HttpError {
 	if submission.IsAnswerCorrect {
-		httpErr := handleCorrectAnswer(submission.Username, submission.Word)
+		httpErr := handleCorrectAnswer(username, submission.Word)
 		if httpErr != nil {
 			return httperrors.WrapError(httpErr)
 		}
 		return nil
 	}
 
-	httpErr := handleIncorrectAnswer(submission.Username, submission.Word)
+	httpErr := handleIncorrectAnswer(username, submission.Word)
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr) //todo: let WrapError handle nil errors so that you could just return httperrors.WrapError(httpErr)
 	}

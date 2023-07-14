@@ -8,8 +8,8 @@ import (
 )
 
 type WordsLists struct {
-	LearnedWords  []string `json:"learnedWords"`
-	LearningWords []string `json:"learningWords"`
+	Learned  []string `json:"learned"`
+	Learning []string `json:"learning"`
 }
 
 func getWordsLearnedFor(username string) ([]string, *httperrors.HttpError) {
@@ -39,8 +39,8 @@ func GetWordsFor(username string) ([]byte, *httperrors.HttpError) {
 	}
 
 	var words WordsLists
-	words.LearnedWords = wordsLearned
-	words.LearningWords = wordsLearning
+	words.Learned = wordsLearned
+	words.Learning = wordsLearning
 
 	wordsJson, err := json.Marshal(&words)
 	if err != nil {

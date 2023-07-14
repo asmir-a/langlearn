@@ -1,26 +1,13 @@
 import React from 'react';
+import axios from 'axios';
 
-import { authStateEnum } from '../../auth/auth';
-
-import { endpoints, httpCodes } from '../../utilities';
+import { logoutHandler } from './../../auth/auth';
 
 const LogoutButton = ({ setAuthState }) => {
-    const handleClick = async (_) => {
-        const responseToLogout = await axios.post(endpoints.logout);
-        if (responseToLogout.status === httpCodes.ok) {
-            setAuthState(prev => {
-                return { ...prev, state: authStateEnum.shouldLogin }
-            })
-        } else {
-            throw new Error(
-                "not implemented; status code from response: ",
-                responseToLogout.status,
-            )
-        }
-    }
-
     return (
-        <button onClick={handleClick}>logout</button>
+        <button
+            onClick={(_) => logoutHandler(setAuthState)}
+        >logout</button>
     );
 };
 

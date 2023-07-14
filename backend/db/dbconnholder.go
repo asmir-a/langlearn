@@ -5,11 +5,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
-var Conn *pgx.Conn
+var Conn *pgxpool.Pool
 
 func init() {
 	initDbConn()
@@ -20,7 +20,7 @@ func initDbConn() {
 	DB_STRING := os.Getenv("DB_STRING")
 
 	var err error
-	Conn, err = pgx.Connect(context.Background(), DB_STRING) //why context background
+	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background
 
 	if err != nil {
 		log.Fatal("could not connect to the database:\n", err)

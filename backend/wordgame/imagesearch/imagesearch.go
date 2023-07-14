@@ -2,7 +2,6 @@ package imagesearch
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,7 +14,9 @@ var googleImageSearchUrl string = os.Getenv("GOOGLE_IMAGE_SEARCH_URL")
 var googleImageSearchEngineId string = os.Getenv("GOOGLE_IMAGE_SEARCH_ENGINE_ID")
 var googleImageSearchToken string = os.Getenv("GOOGLE_IMAGE_SEARCH_TOKEN")
 var googleImageSearchType string = "image"
-var googleImageSearchResultsLimit string = "1"
+var googleImageSearchResultsLimit string = "3"
+var googleImageSearchImageSize string = "medium"
+var googleImageSearchImageType string = "PHOTO"
 var googleImageSearchRights string = os.Getenv("GOOGLE_IMAGE_SEARCH_LICENSE")
 
 var googleImageSearchParams map[string]string = map[string]string{
@@ -24,6 +25,8 @@ var googleImageSearchParams map[string]string = map[string]string{
 	"searchType": googleImageSearchType,
 	"rights":     googleImageSearchRights,
 	"num":        googleImageSearchResultsLimit,
+	"imgSize":    googleImageSearchImageSize,
+	"imgType":    googleImageSearchImageType,
 }
 
 type googleImageSearchResponseItem struct {
@@ -78,13 +81,17 @@ func fetchResponseItemsFor(query string) (googleImageSearchResponseItems, *httpe
 	return responseData, nil
 }
 
-func FetchImageUrlFor(query string) (string, *httperrors.HttpError) {
+func FetchImageUrlsFor(query string) ([]string, *httperrors.HttpError) {
 	responseItems, httpErr := fetchResponseItemsFor(query)
 	if httpErr != nil {
-		return "", httperrors.WrapError(httpErr)
+		return nil, httperrors.WrapError(httpErr)
 	}
 	if len(responseItems.Items) == 0 {
-		httperrors.Fatal(errors.New("[potential issue: engine quota exceeded]"))
+		return nil, httperrors.WrapError(httpErr)
 	}
-	return responseItems.Items[0].Link, nil
+	imageUrls := []string{}
+	for _, item := range responseItems.Items {
+		imageUrls = append(imageUrls, item.Link)
+	}
+	return imageUrls, nil
 }

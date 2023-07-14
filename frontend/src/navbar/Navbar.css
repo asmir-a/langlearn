@@ -1,0 +1,15 @@
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+nav button {
+    font-weight: bold;
+    width: 6em;
+    border: none;
+}
+
+nav button:last-child{
+    margin-left: auto;
+}

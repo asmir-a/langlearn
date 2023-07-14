@@ -1,31 +1,24 @@
 import React from 'react';
 
-import { getNavbarButtons } from './nav';
+import { getNavbarButtonsBuilder, passStateSettersToNavbarButtons } from './logic';
 
-const Navbar = ({ authState, setAuthState, whichPage, setWhichPage }) => {
-    const buttons = getNavbarButtons(authState, whichPage);
+import "./Navbar.css";
 
-    const authButtons = buttons.authButtons;
-    const authButtonsComponents = authButtons.map((AuthButton, index) => {
-        return <AuthButton
-            setAuthState={setAuthState}
-            key={`authButton#${index}`}
-        />;
-    });
-
-    const pageButtons = buttons.pageButtons;
-    const pageButtonsComponents = pageButtons.map((PageButton, index) => {
-        return <PageButton
-            setWhichPage={setWhichPage}
-            key={`pageButton#${index}`}
-        />;
-    });
-
-    const allButtonsComponents = [...authButtonsComponents, ...pageButtonsComponents];
+const Navbar = ({
+    authState, //maybe, it would have been better if app was building the navbar by itself. or, there might be an approach that utilizes custom hooks.
+    setAuthState,
+    whichAuthPage,
+    setWhichAuthPage,
+    whichContentPage,
+    setWhichContentPage
+}) => {
+    const buttonsBuilder = getNavbarButtonsBuilder(authState, setAuthState);
+    const buttons = buttonsBuilder(whichAuthPage, whichContentPage);
+    const buttonsWithStateSetters = passStateSettersToNavbarButtons(buttons, setWhichAuthPage, setWhichContentPage);
 
     return (
         <nav>
-            {allButtonsComponents}
+            {buttonsWithStateSetters}
         </nav>
     )
 }

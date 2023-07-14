@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { whichPageEnum } from '../../pages/pages';
+import { whichContentPageEnum } from '../../pages/pages';
 
-const WordGameButton = ({ setWhichPage }) => {
+const WordGameButton = ({ setWhichContentPage }) => {
     return (
-        <button onClick={(_) => { setWhichPage(whichPageEnum.wordGame) }}></button>
+        <button onClick={(_) => { setWhichContentPage(whichContentPageEnum.wordGame) }}>WordGame</button>
     );
 }
 

@@ -1,13 +1,11 @@
 import React from 'react';
 
-import { authStateEnum } from '../../auth/auth';
+import { whichAuthPageEnum } from '../../auth/auth';
 
-const SignupButton = ({ setAuthState }) => {
+const SignupButton = ({ setWhichAuthPage }) => {
     return (
         <button onClick={() => {
-            setAuthState(prevState => {
-                return { ...prevState, state: authStateEnum.shouldSignup }
-            });
+            setWhichAuthPage(whichAuthPageEnum.signup);
         }}>to signup</button>
     )
 }

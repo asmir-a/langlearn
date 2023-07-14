@@ -28,7 +28,7 @@ func ExtractWordsFromWordsWithDefs(wordsWithDefs []WordWithDefs) []string {
 	return words
 }
 
-func getMaxIndex() (int, *httperrors.HttpError) {
+func GetMaxIndex() (int, *httperrors.HttpError) {
 	query := `
 		SELECT max(index) 
 		FROM korean_words
@@ -38,23 +38,18 @@ func getMaxIndex() (int, *httperrors.HttpError) {
 	if err := row.Scan(&maxIndexDb); err != nil {
 		return 0, httperrors.NewHttp500Error(err)
 	}
-	return maxIndexDb / 50, nil
+	return maxIndexDb, nil
 }
 
-func GetRandomKoreanWords() ([]WordWithDefs, *httperrors.HttpError) {
+func GetRandomKoreanWords(maxIndex int) ([]WordWithDefs, *httperrors.HttpError) {
 	query := `
 		SELECT word, defs
 		FROM korean_words
 		WHERE index = ANY ($1)
 	` //freq info is also prolly needed
 
-	maxIndex, httpErr := getMaxIndex()
-	if httpErr != nil {
-		return []WordWithDefs{}, httperrors.WrapError(httpErr)
-	}
-
 	randomIndicesSet := make(map[int]bool)
-	for len(randomIndicesSet) != 4 {
+	for len(randomIndicesSet) != numberOfRandomWords {
 		randomIndex := rand.Intn(maxIndex)
 		randomIndicesSet[randomIndex] = true
 	}

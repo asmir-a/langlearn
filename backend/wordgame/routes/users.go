@@ -36,12 +36,12 @@ func handlerBuilderWords(params map[string]string) http.Handler {
 	return httperrors.HandlerWithHttpError(handlerWords)
 }
 
-func NewUsersRouter() *gorestrouter.Router {
+func NewKnowsRouter() *gorestrouter.Router {
 	//prolly it is fine if this router handles the authorization logic
-	usersRouter := &gorestrouter.Router{}
+	knowsRouter := &gorestrouter.Router{}
 
-	usersRouter.Handle("/[username]/wordgame/stats", handlerBuilderStats)
-	usersRouter.Handle("/[username]/wordgame/words", handlerBuilderWords)
+	knowsRouter.Handle("/[username]/word-counts", handlerBuilderStats) //need to protect the router here
+	knowsRouter.Handle("/[username]/words", handlerBuilderWords)
 
-	return usersRouter
+	return knowsRouter
 }

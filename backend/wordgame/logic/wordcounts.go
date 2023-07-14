@@ -9,8 +9,8 @@ import (
 )
 
 type WordCounts struct {
-	LearnedCount  int `json:"learnedCount"`
-	LearningCount int `json:"learningCount"`
+	Learned  int `json:"learned"`
+	Learning int `json:"learning"`
 }
 
 func GetWordCountsFor(username string) ([]byte, *httperrors.HttpError) {
@@ -23,8 +23,8 @@ func GetWordCountsFor(username string) ([]byte, *httperrors.HttpError) {
 		return nil, httperrors.WrapError(httpErr)
 	}
 	wordCounts := WordCounts{
-		LearnedCount:  learnedCount,
-		LearningCount: learningCount,
+		Learned:  learnedCount,
+		Learning: learningCount,
 	}
 	byteBuf := bytes.NewBuffer([]byte{})
 	encoder := json.NewEncoder(byteBuf)
