@@ -2,7 +2,7 @@ import React from 'react';
 
 import LoginButton from './buttons/Login';
 import SignupButton from './buttons/Signup';
-import LogoutButton from './buttons/logout';
+import LogoutButton from './buttons/Logout';
 import StatsButton from './buttons/Stats';
 import WordGameButton from './buttons/WordGame';
 
