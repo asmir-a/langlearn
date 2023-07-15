@@ -9,10 +9,10 @@ import (
 	wordgameRoutes "github.com/asmir-a/langlearn/backend/wordgame/routes"
 )
 
-
 func setUpHealthChecksForAws(mux *http.ServeMux) {
 	mux.Handle("/api/healthcheck",
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			log.Println("received healthchek")
 			w.Write([]byte("everything is okay"))
 		}))
 }
