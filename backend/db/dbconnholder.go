@@ -17,7 +17,8 @@ func init() {
 
 func initDbConn() {
 	godotenv.Load()
-	DB_STRING := os.Getenv("DB_STRING")
+	_ = os.Getenv("DB_STRING")
+	DB_STRING := "postgresql://postgres:qwertyuiop@langlearndb.cmhmoaojrw66.ap-northeast-2.rds.amazonaws.com:5432/langlearn"
 	log.Println("DB STRING: ", DB_STRING)
 
 	var err error
