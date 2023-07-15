@@ -5,13 +5,41 @@ import (
 	"log"
 	"os"
 
+	"github.com/asmir-a/langlearn/backend/httperrors"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
 var Conn *pgxpool.Pool
 
+func getSecretFromAwsSecretsManager() {
+	secretName := "DB_STRING"
+	region := "ap-northeast-2"
+
+	config, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(region))
+	if err != nil {
+		httperrors.Fatal(err)
+	}
+
+	svc := secretsmanager.NewFromConfig(config)
+	input := &secretsmanager.GetSecretValueInput{
+		SecretId: aws.String(secretName),
+	}
+
+	result, err := svc.GetSecretValue(context.TODO(), input)
+	if err != nil {
+		httperrors.Fatal(err)
+	}
+
+	var secretString string = *result.SecretString
+	log.Println("the secret is: ", secretString)
+}
+
 func init() {
+	getSecretFromAwsSecretsManager()
 	initDbConn()
 }
 
