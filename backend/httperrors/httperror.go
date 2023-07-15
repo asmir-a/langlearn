@@ -50,6 +50,7 @@ func WrapError(httpErr *HttpError) *HttpError {
 
 func Fatal(err error) {
 	funcInfo := debug.GetFuncInfo(2)
+	log.Println(err)
 	log.Fatal(funcInfo)
 }
 
