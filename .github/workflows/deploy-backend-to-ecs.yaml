@@ -31,15 +31,6 @@ jobs:
       - name: Build, tag, and push image to AWS ECR
         env:
           IMAGE_TAG: v0
-          DB_STRING:                     ${{  secrets.DB_STRING }}
-          GOOGLE_IMAGE_SEARCH_URL:       ${{  vars.GOOGLE_IMAGE_SEARCH_URL }}      
-          GOOGLE_IMAGE_SEARCH_ENGINE_ID: ${{  vars.GOOGLE_IMAGE_SEARCH_ENGINE_ID  }}
-          GOOGLE_IMAGE_SEARCH_TOKEN:     ${{  secrets.GOOGLE_IMAGE_SEARCH_TOKEN }}
-          GOOGLE_IMAGE_SEARCH_LICENSE:   ${{  vars.GOOGLE_IMAGE_SEARCH_LICENSE  }}
-          S3_WORDGAME_BUCKET_NAME:       ${{  vars.S3_WORDGAME_BUCKET_NAME  }}
-          S3_WORDGAME_BUCKET_URL_START:  ${{  vars.S3_WORDGAME_BUCKET_URL_START }}
-          OPENAI_DALLE_URL:              ${{  vars.OPENAI_DALLE_URL }} 
-          OPENAI_DALLE_KEY:              ${{  vars.OPENAI_DALLE_KEY }}
         run: |
           docker build -t $ECR_REPO:$IMAGE_TAG --platform linux/amd64 backend/
           docker push $ECR_REPO:$IMAGE_TAG
