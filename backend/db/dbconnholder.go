@@ -18,6 +18,7 @@ func init() {
 func initDbConn() {
 	godotenv.Load()
 	DB_STRING := os.Getenv("DB_STRING")
+	log.Println("DB STRING: ", DB_STRING)
 
 	var err error
 	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background
