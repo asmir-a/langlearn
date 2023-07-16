@@ -42,6 +42,9 @@ func getSecretFromAwsSecretsManagerUsingSdk() {
 func getSecretFromAwsSecretsManager() {
 	secretValue := os.Getenv("username_value")
 	log.Println("the value of the username_value is: ", secretValue)
+
+	dbSecretValue := os.Getenv("DB_STRING")
+	log.Println("the db secrete is: ", dbSecretValue)
 }
 
 func init() {
