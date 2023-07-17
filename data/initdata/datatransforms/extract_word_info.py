@@ -2,8 +2,8 @@ import os
 import yaml
 
 current_source_file = os.path.dirname(__file__)
-KOR_WORDS_PATH = os.path.join(current_source_file, "./originaldata/korean-words-basic-info.yml")
-PART_OF_SPEECH_PATH = os.path.join(current_source_file, "./originaldata/part-of-speech.yml")
+KOR_WORDS_PATH = os.path.join(current_source_file, "./../originaldata/korean-words-basic-info.yml")
+PART_OF_SPEECH_PATH = os.path.join(current_source_file, "./../originaldata/part-of-speech.yml")
 
 def extract_word_info(word_info_path = KOR_WORDS_PATH, part_of_speech_path = PART_OF_SPEECH_PATH):
     with open(word_info_path) as word_info, open(part_of_speech_path) as part_of_speech:

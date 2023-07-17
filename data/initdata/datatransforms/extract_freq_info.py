@@ -2,7 +2,7 @@ import os
 from bs4 import BeautifulSoup
 
 current_source_file = os.path.dirname(__file__)
-PATH_TO_FREQ_LIST = os.path.join(current_source_file, "./originaldata/wiki-5800.html")
+PATH_TO_FREQ_LIST = os.path.join(current_source_file, "./../originaldata/wiki-5800.html")
 
 def extract_freq_info(file_path = PATH_TO_FREQ_LIST):
     with open(file_path) as file:
