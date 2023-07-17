@@ -2,9 +2,13 @@ package db
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/asmir-a/langlearn/backend/httperrors"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -39,6 +43,29 @@ func getSecretFromAwsSecretsManagerUsingSdk() { //not needed, gettings from the 
 	log.Println("the secret is: ", secretString)
 }
 
+type dbInfo struct {
+	Engine   string `json:"engine"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Dbname   string `json:"dbname"`
+}
+
+func turnDbInfoFromJsonToString(dbInfoJson []byte) string {
+	var dbInfoStruct dbInfo
+	json.Unmarshal(dbInfoJson, &dbInfoStruct)
+	dbInfoString := fmt.Sprintf("%s://%s:%s@%s:%s/%s",
+		dbInfoStruct.Engine,
+		dbInfoStruct.Username,
+		dbInfoStruct.Password,
+		dbInfoStruct.Host,
+		dbInfoStruct.Port,
+		dbInfoStruct.Dbname,
+	)
+	return dbInfoString
+}
+
 func init() {
 	initDbConn()
 }
@@ -46,8 +73,12 @@ func init() {
 func initDbConn() {
 	godotenv.Load() //need to refactor so that this is only used when we are in dev mode
 	DB_STRING := os.Getenv("DB_STRING")
-	log.Println("new revision")
+	if DB_STRING == "" {
+		httperrors.Fatal(errors.New("DB_STRING is empty"))
+	}
 	log.Println("the db string is: ", DB_STRING)
+	DB_STRING = turnDbInfoFromJsonToString([]byte(DB_STRING))
+	log.Println("processed db string is: ", DB_STRING)
 
 	var err error
 	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background
