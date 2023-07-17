@@ -76,9 +76,7 @@ func initDbConn() {
 	if DB_STRING == "" {
 		httperrors.Fatal(errors.New("DB_STRING is empty"))
 	}
-	log.Println("the db string is: ", DB_STRING)
 	DB_STRING = turnDbInfoFromJsonToString([]byte(DB_STRING))
-	log.Println("processed db string is: ", DB_STRING)
 
 	var err error
 	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background

@@ -3,7 +3,6 @@ package imagesearch
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -36,13 +35,6 @@ type googleImageSearchResponseItem struct {
 
 type googleImageSearchResponseItems struct {
 	Items []googleImageSearchResponseItem `json:"items"`
-}
-
-func init() { //just for testing purposes; it will be removed
-	for param := range googleImageSearchParams {
-		log.Println("the param is: ", param)
-	}
-	log.Println("the token is: ", googleImageSearchToken)
 }
 
 func filterAndConvertFromJsonToData(responseBody string) (googleImageSearchResponseItems, *httperrors.HttpError) {
