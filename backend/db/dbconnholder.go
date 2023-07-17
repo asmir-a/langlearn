@@ -14,7 +14,7 @@ import (
 
 var Conn *pgxpool.Pool
 
-func getSecretFromAwsSecretsManagerUsingSdk() {
+func getSecretFromAwsSecretsManagerUsingSdk() { //not needed, gettings from the environment variables is the same; and it wont work now; changes to the taskRun roles are required
 	secretName := "username_value"
 	region := "ap-northeast-2"
 
@@ -39,25 +39,14 @@ func getSecretFromAwsSecretsManagerUsingSdk() {
 	log.Println("the secret is: ", secretString)
 }
 
-func getSecretFromAwsSecretsManager() {
-	secretValue := os.Getenv("username_value")
-	log.Println("the value of the username_value is: ", secretValue)
-
-	dbSecretValue := os.Getenv("DB_STRING")
-	log.Println("the db secrete is: ", dbSecretValue)
-}
-
 func init() {
-	getSecretFromAwsSecretsManager()
-	getSecretFromAwsSecretsManagerUsingSdk()
 	initDbConn()
 }
 
 func initDbConn() {
-	godotenv.Load()
-	_ = os.Getenv("DB_STRING")
-	DB_STRING := "postgresql://postgres:qwertyuiop@langlearndb.cmhmoaojrw66.ap-northeast-2.rds.amazonaws.com:5432/langlearn"
-	log.Println("DB STRING: ", DB_STRING)
+	godotenv.Load() //need to refactor so that this is only used when we are in dev mode
+	DB_STRING := os.Getenv("DB_STRING")
+	log.Println("the db string is: ", DB_STRING)
 
 	var err error
 	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background
