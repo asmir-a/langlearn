@@ -7,7 +7,7 @@ import (
 	"github.com/asmir-a/langlearn/backend/wordgame/dbwrappers"
 )
 
-type WordsLists struct {
+type wordsLists struct {
 	Learned  []string `json:"learned"`
 	Learning []string `json:"learning"`
 }
@@ -38,7 +38,7 @@ func GetWordsFor(username string) ([]byte, *httperrors.HttpError) {
 		return nil, httperrors.WrapError(httpErr)
 	}
 
-	var words WordsLists
+	var words wordsLists
 	words.Learned = wordsLearned
 	words.Learning = wordsLearning
 

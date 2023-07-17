@@ -72,14 +72,14 @@ func init() {
 
 func initDbConn() {
 	godotenv.Load() //need to refactor so that this is only used when we are in dev mode
-	DB_STRING := os.Getenv("DB_STRING")
-	if DB_STRING == "" {
+	dbStringJson := os.Getenv("DB_STRING")
+	if dbStringJson == "" {
 		httperrors.Fatal(errors.New("DB_STRING is empty"))
 	}
-	DB_STRING = turnDbInfoFromJsonToString([]byte(DB_STRING))
+	dbString := turnDbInfoFromJsonToString([]byte(dbStringJson))
 
 	var err error
-	Conn, err = pgxpool.New(context.Background(), DB_STRING) //why context background
+	Conn, err = pgxpool.New(context.Background(), dbString) //why context background
 
 	if err != nil {
 		log.Fatal("could not connect to the database:\n", err)

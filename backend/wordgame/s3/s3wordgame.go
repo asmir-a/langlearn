@@ -3,7 +3,6 @@ package s3wordgame
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -104,22 +103,19 @@ func uploadFileFromWebToS3(word string, fileUrl string, fileIndexInBucket int) *
 	return nil
 }
 
-func UploadFilesFromWebToS3(dirName string, fileUrls []string) *httperrors.HttpError {
+func UploadFilesFromWebToS3(dirName string, fileUrls []string) *httperrors.HttpError { //gorouting logic needs to be put into a central place. This file should not handle that.
 	numberOfWebImages := len(fileUrls)
 	var wg sync.WaitGroup
 	var httpErr *httperrors.HttpError
-	fmt.Println("starting the goroutines to fetch the images")
 	for taskIndex := 1; taskIndex <= numberOfWebImages; taskIndex++ {
 		wg.Add(1)
 		taskIndex := taskIndex
 		go func() {
 			defer wg.Done()
 			httpErr = uploadFileFromWebToS3(dirName, fileUrls[taskIndex-1], taskIndex)
-			fmt.Println(taskIndex, "th routine is done")
 		}()
 	}
 	wg.Wait()
-	fmt.Println("all goroutines are done")
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr)
 	}

@@ -33,7 +33,7 @@ func handlerBuilderGameEntriesRandom(params map[string]string) http.Handler {
 	return httperrors.HandlerWithHttpError(handlerGameEntries)
 }
 
-func extractSubmissionFromRequest(req *http.Request) (logic.WordGameSubmission, *httperrors.HttpError) {
+func extractSubmissionFromRequest(req *http.Request) (logic.WordGameSubmission, *httperrors.HttpError) { //this should be refactored: the submission could be extracted from the body intead and this function should be in the submission.go file; then, the struct would not need to be exported
 	decoder := json.NewDecoder(req.Body)
 	var submission logic.WordGameSubmission
 	if err := decoder.Decode(&submission); err != nil {
