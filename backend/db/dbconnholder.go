@@ -46,6 +46,7 @@ func init() {
 func initDbConn() {
 	godotenv.Load() //need to refactor so that this is only used when we are in dev mode
 	DB_STRING := os.Getenv("DB_STRING")
+	log.Println("new revision")
 	log.Println("the db string is: ", DB_STRING)
 
 	var err error
