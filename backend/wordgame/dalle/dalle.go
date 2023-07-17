@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -29,6 +30,10 @@ type urlEntry struct {
 type dalleResponse struct {
 	Created int        `json:"created"`
 	Data    []urlEntry `json:"data"`
+}
+
+func init() {
+	log.Println("the dalle token is: ", openAiDalleKey)
 }
 
 func turnPromptToMoreExpressive(prompt string) string {
