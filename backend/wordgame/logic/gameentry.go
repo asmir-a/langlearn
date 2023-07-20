@@ -10,7 +10,7 @@ import (
 	s3wordgame "github.com/asmir-a/langlearn/backend/wordgame/s3"
 )
 
-type WordGameEntry struct {
+type wordGameEntry struct {
 	CorrectWord          string   `json:"correctWord"`
 	CorrectWordImageUrls []string `json:"correctWordImageUrls"`
 	IncorrectWords       []string `json:"incorrectWords"`
@@ -61,22 +61,22 @@ func calculateMaxIndexForUser(maxIndex int, wordsLearnedCount int) int {
 	}
 }
 
-func getGameEntry(username string) (WordGameEntry, *httperrors.HttpError) {
+func getGameEntry(username string) (wordGameEntry, *httperrors.HttpError) {
 	learnedWordsCount, httpErr := dbwrappers.GetWordsLearnedCount(username)
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr)
+		return wordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	maxIndex, httpErr := dbwrappers.GetMaxIndex()
 
 	maxIndexForUser := calculateMaxIndexForUser(maxIndex, learnedWordsCount)
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr)
+		return wordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	words, httpErr := dbwrappers.GetRandomKoreanWords(maxIndexForUser)
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr)
+		return wordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	correctWordIndex := 0
@@ -86,13 +86,13 @@ func getGameEntry(username string) (WordGameEntry, *httperrors.HttpError) {
 
 	correctWordImageUrls, httpErr := getImageUrls(correctWord, correctWordDef)
 	if httpErr != nil {
-		return WordGameEntry{}, httperrors.WrapError(httpErr)
+		return wordGameEntry{}, httperrors.WrapError(httpErr)
 	}
 
 	incorrectWordsWithDefs := words[1:]
 	incorrectWords := dbwrappers.ExtractWordsFromWordsWithDefs(incorrectWordsWithDefs) //todo: this does not belong to dbwrappers; also the type prolly should be shared among these packages
 
-	return WordGameEntry{
+	return wordGameEntry{
 		CorrectWord:          correctWord,
 		CorrectWordImageUrls: correctWordImageUrls,
 		IncorrectWords:       incorrectWords,

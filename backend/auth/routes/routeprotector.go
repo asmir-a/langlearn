@@ -11,7 +11,7 @@ import (
 //todo big: the auth handling should be user friendly. We first should try to extract the session from the request, and then based on the session present, determine what the error message should be
 //todo: consider if the routes with users/username should be authorized using regex like `.*/users/username/.*` this way we can handle the authorization part before the routing logic begins to run
 
-func CheckIfAuthenticated(currentHandler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError { //todo: needs splitting to other functions
+func CheckIfAuthenticated(currentHandler http.Handler) http.Handler { //todo: needs splitting to other functions
 	authenticatedHandler := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
 		sessionCookie, err := req.Cookie("session_key")
 		if err == http.ErrNoCookie {
@@ -44,15 +44,13 @@ func CheckIfAuthenticated(currentHandler httperrors.HandlerWithHttpError) httper
 			)
 		}
 
-		if httpErr = currentHandler(w, req); httpErr != nil {
-			return httperrors.WrapError(httpErr)
-		}
+		currentHandler.ServeHTTP(w, req)
 		return nil
 	}
 	return httperrors.HandlerWithHttpError(authenticatedHandler)
 }
 
-func CheckIfAuthorized(username string, currentHandler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError {
+func CheckIfAuthorized(username string, currentHandler httperrors.HandlerWithHttpError) httperrors.HandlerWithHttpError { //not used at all
 	authorizedHandler := func(w http.ResponseWriter, req *http.Request) *httperrors.HttpError {
 		sessionCookie, err := req.Cookie("session_key") //todo: this logic is duplicated in this function and in the previous function
 		if err == http.ErrNoCookie {

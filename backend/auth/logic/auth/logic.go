@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/asmir-a/langlearn/backend/auth/dbwrappers"
 	"github.com/asmir-a/langlearn/backend/httperrors"
 )
 
@@ -24,6 +25,7 @@ func validatePassword(password string) bool {
 	if password == "" {
 		return false
 	}
+	//other checks
 	return true
 }
 
@@ -36,4 +38,16 @@ func validateCredentials(username string, password string) *httperrors.HttpError
 		)
 	}
 	return nil
+}
+
+func CheckIfUsernameMathcesCookie(username string, sessionKey string) (bool, *httperrors.HttpError) {
+	//assumes that the session is valid and exists in the database
+	sessionInDb, httpErr := dbwrappers.GetSessionFor(username)
+	if httpErr != nil {
+		return false, httperrors.WrapError(httpErr)
+	}
+	if sessionKey != sessionInDb {
+		return false, nil
+	}
+	return true, nil
 }

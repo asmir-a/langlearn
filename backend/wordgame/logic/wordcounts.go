@@ -8,7 +8,7 @@ import (
 	"github.com/asmir-a/langlearn/backend/wordgame/dbwrappers"
 )
 
-type WordCounts struct {
+type wordCounts struct {
 	Learned  int `json:"learned"`
 	Learning int `json:"learning"`
 }
@@ -22,7 +22,7 @@ func GetWordCountsFor(username string) ([]byte, *httperrors.HttpError) {
 	if httpErr != nil {
 		return nil, httperrors.WrapError(httpErr)
 	}
-	wordCounts := WordCounts{
+	wordCounts := wordCounts{
 		Learned:  learnedCount,
 		Learning: learningCount,
 	}

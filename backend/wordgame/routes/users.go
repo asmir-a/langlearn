@@ -40,8 +40,11 @@ func NewKnowsRouter() *gorestrouter.Router {
 	//prolly it is fine if this router handles the authorization logic
 	knowsRouter := &gorestrouter.Router{}
 
-	knowsRouter.Handle("/[username]/word-counts", handlerBuilderStats) //need to protect the router here
-	knowsRouter.Handle("/[username]/words", handlerBuilderWords)
+	authorizedHandlerBuilderStats := authorizeRouteTwo(handlerBuilderStats)
+	knowsRouter.Handle("/[username]/word-counts", authorizedHandlerBuilderStats) //need to protect the router here
+
+	authorizedHandlerBuilderWords := authorizeRouteTwo(handlerBuilderWords)
+	knowsRouter.Handle("/[username]/words", authorizedHandlerBuilderWords)
 
 	return knowsRouter
 }
