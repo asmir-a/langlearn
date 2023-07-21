@@ -20,7 +20,6 @@ export const whichAuthPageEnum = {
 export const makeRequestToUser = async (setAuthState) => {
     try {
         const response = await axios.get(endpoints.user)
-        console.log("the response that i got from the server is: ", response);
         if (response.status === httpCodes.ok) {
             const user = response.data;
             setAuthState({

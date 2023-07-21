@@ -20,11 +20,17 @@ def is_words_table_empty(engine):
 
 def populate_table():
     engine = create_engine(CONNECTION_STRING)
-    if not is_words_table_empty(engine):
-        return
-
     words_pd = get_full_word_info()
-    simplify_definitions_column(words_pd)
+
+    words_pd.sort_values("freq_rank", inplace=True)
+
+    words_pd["defs"] = words_pd["defs"].apply(lambda defs_list: tuple(defs_list))
+    words_pd.drop_duplicates(subset=["word", "defs"], inplace=True)
+    words_pd.reset_index(inplace=True, drop=True)
+
+    print(words_pd)
+
+    # simplify_definitions_column(words_pd)
     engine = create_engine(CONNECTION_STRING)
     words_pd.to_sql(
         "korean_words", 

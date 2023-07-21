@@ -40,7 +40,7 @@ func validateCredentials(username string, password string) *httperrors.HttpError
 	return nil
 }
 
-func CheckIfUsernameMathcesCookie(username string, sessionKey string) (bool, *httperrors.HttpError) {
+func CheckIfUsernameMatchesCookie(username string, sessionKey string) (bool, *httperrors.HttpError) {
 	//assumes that the session is valid and exists in the database
 	sessionInDb, httpErr := dbwrappers.GetSessionFor(username)
 	if httpErr != nil {
@@ -50,4 +50,44 @@ func CheckIfUsernameMathcesCookie(username string, sessionKey string) (bool, *ht
 		return false, nil
 	}
 	return true, nil
+}
+
+func AuthorizeUsername(username string, sessionCookie string) *httperrors.HttpError {
+	doesSessionExist, httpErr := dbwrappers.CheckIfSessionExistsFor(username)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	if !doesSessionExist {
+		return httperrors.NewHttpError(
+			errors.New("session does not exist"),
+			http.StatusUnauthorized,
+			"please login or signup",
+		)
+	}
+
+	isSessionValid, httpErr := dbwrappers.CheckIfSessionIsValid(sessionCookie)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	if !isSessionValid {
+		return httperrors.NewHttpError(
+			errors.New("session is invalid"),
+			http.StatusUnauthorized,
+			"please login again",
+		)
+	}
+
+	usernameMatchesSession, httpErr := CheckIfUsernameMatchesCookie(username, sessionCookie)
+	if httpErr != nil {
+		return httperrors.WrapError(httpErr)
+	}
+	if !usernameMatchesSession {
+		return httperrors.NewHttpError(
+			errors.New("session does not match"),
+			http.StatusUnauthorized,
+			"something is wrong with the cookie",
+		)
+	}
+
+	return nil
 }
