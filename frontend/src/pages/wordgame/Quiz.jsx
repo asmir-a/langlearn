@@ -42,16 +42,14 @@ const Quiz = ({user}) => {
                 <h1>select the right word matching the image</h1>
                 <figure>
                     {gameEntry.correctWordImageUrls.map((imageUrl, index) => {
-                        return <div>
-                            <img className = "image-item"
-                                src={imageUrl}
-                                key={index}
-                                onLoad={handleImageLoad}
-                                style={
-                                    atLeastOneImageLoaded ? {} : {display: "none"}
-                                }
-                            />
-                        </div>
+                        return <img className="image-item"
+                            src={imageUrl}
+                            key={index}
+                            onLoad={handleImageLoad}
+                            style={
+                                atLeastOneImageLoaded ? {} : { display: "none" }
+                            }
+                        />
                     })}
                 </figure>
                 <section>
