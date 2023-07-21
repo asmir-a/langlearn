@@ -17,10 +17,15 @@
     --button-hover-color: #392F5A;
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 body {
     margin: 0;
     width: 100vw;
     height: 100vh;
+    position: relative;
 }
 
 #root {
