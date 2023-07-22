@@ -16,9 +16,13 @@ article.quiz figure {
     display: grid;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 
+    "grid-cell-image grid-cell-image"
+    "grid-cell-image grid-cell-image";
 }
 
 article.quiz figure img {
+    grid-area: grid-cell-image;
     display: block;
     object-fit: fill;
     max-width: 100%;
