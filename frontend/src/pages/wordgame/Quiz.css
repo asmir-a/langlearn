@@ -16,9 +16,6 @@ article.quiz figure {
     display: grid;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: 
-    "grid-cell-image1 grid-cell-image2"
-    "grid-cell-image3 grid-cell-image4";
 }
 
 article.quiz figure img {
@@ -32,22 +29,6 @@ article.quiz figure img {
     min-width: 0; /*by default, it is auto which makes the image's initial size the min size of the grid item*/
     min-height: 0;
     border: 1px solid red;
-}
-
-article.quiz figure img:nth-child(1) {
-    grid-area: grid-cell-image1;
-}
-
-article.quiz figure img:nth-child(2) {
-    grid-area: grid-cell-image2;
-}
-
-article.quiz figure img:nth-child(3) {
-    grid-area: grid-cell-image3;
-}
-
-article.quiz figure img:nth-child(4) {
-    grid-area: grid-cell-image4;
 }
      
 article.quiz section {
