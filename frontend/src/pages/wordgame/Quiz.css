@@ -23,6 +23,7 @@ article.quiz figure {
 
 article.quiz figure img {
     display: block;
+    position: absolute;
     object-fit: fill;
     max-width: 100%;
     max-height: 100%;
@@ -31,6 +32,7 @@ article.quiz figure img {
     /*why git actions was not triggered*/
     min-width: 0; /*by default, it is auto which makes the image's initial size the min size of the grid item*/
     min-height: 0;
+    border: 1px solid red;
 }
 
 article.quiz figure img:nth-child(1) {
