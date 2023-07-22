@@ -17,12 +17,11 @@ article.quiz figure {
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: 
-    "grid-cell-image grid-cell-image"
-    "grid-cell-image grid-cell-image";
+    "grid-cell-image1 grid-cell-image2"
+    "grid-cell-image3 grid-cell-image4";
 }
 
 article.quiz figure img {
-    grid-area: grid-cell-image;
     display: block;
     object-fit: fill;
     max-width: 100%;
@@ -34,7 +33,22 @@ article.quiz figure img {
     min-height: 0;
 }
 
+article.quiz figure img:nth-child(1) {
+    grid-area: grid-cell-image1;
+}
 
+article.quiz figure img:nth-child(2) {
+    grid-area: grid-cell-image2;
+}
+
+article.quiz figure img:nth-child(3) {
+    grid-area: grid-cell-image3;
+}
+
+article.quiz figure img:nth-child(4) {
+    grid-area: grid-cell-image4;
+}
+     
 article.quiz section {
     height: 20%;
     margin-top: auto;
