@@ -25,10 +25,10 @@ var googleImageSearchParams map[string]string = map[string]string{
 	"cx":         googleImageSearchEngineId,
 	"key":        googleImageSearchToken,
 	"searchType": googleImageSearchType,
-	"rights":     googleImageSearchRights,
-	"num":        googleImageSearchResultsLimit,
-	"imgSize":    googleImageSearchImageSize,
-	"imgType":    googleImageSearchImageType,
+	// "rights":     googleImageSearchRights,
+	"num":     googleImageSearchResultsLimit,
+	"imgSize": googleImageSearchImageSize,
+	"imgType": googleImageSearchImageType,
 }
 
 type googleImageSearchResponseItem struct {
