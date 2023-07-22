@@ -2,6 +2,7 @@ package imagesearch
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -87,7 +88,7 @@ func FetchImageUrlsFor(query string) ([]string, *httperrors.HttpError) {
 		return nil, httperrors.WrapError(httpErr)
 	}
 	if len(responseItems.Items) == 0 {
-		return nil, httperrors.WrapError(httpErr)
+		return nil, httperrors.NewHttp500Error(errors.New("response from search engine has 0 entries"))
 	}
 	imageUrls := []string{}
 	for _, item := range responseItems.Items {

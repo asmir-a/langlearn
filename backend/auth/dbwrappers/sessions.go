@@ -178,7 +178,7 @@ func CheckIfSessionIsValid(sessionKey string) (bool, *httperrors.HttpError) {
 	return true, nil
 }
 
-func GetUserWith(session_key string) (User, *httperrors.HttpError) {
+func GetUserWith(sessionKey string) (User, *httperrors.HttpError) {
 	query := `
 		SELECT username
 		FROM sessions
@@ -186,10 +186,22 @@ func GetUserWith(session_key string) (User, *httperrors.HttpError) {
 	`
 
 	var username string
-	if err := db.Conn.QueryRow(context.Background(), query, session_key).Scan(&username); err != nil {
+	if err := db.Conn.QueryRow(
+		context.Background(),
+		query,
+		sessionKey,
+	).Scan(&username); err != nil {
 		log.Println(err)
 		return User{}, httperrors.NewHttp500Error(err)
 	}
+	//the session also should be checked
 
 	return User{username}, nil //for now, it is enough to use just the username, but in the future, the whole user struct might be more useful
 }
+
+//todo: this function has a bug in it. it is triggered when the screen was open for some time and session prolly expired. a bit hard to reproduce.
+
+//it would be nice if it was possible to wrap error into a new http error
+//getuserwith returns an http500 error. however, this is not really useful
+//for the client side and also we can return a more meaningful error in this
+//case
