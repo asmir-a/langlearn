@@ -88,7 +88,7 @@ func FetchImageUrlsFor(query string) ([]string, *httperrors.HttpError) {
 	if httpErr != nil {
 		return nil, httperrors.WrapError(httpErr)
 	}
-	log.Printf("the response for query %s received from imagesearch is: %+v\n", query, responseItems)
+	log.Printf("the response of length %d for query %s received from imagesearch is: %+v\n", len(responseItems.Items), query, responseItems)
 	if len(responseItems.Items) == 0 {
 		return nil, httperrors.NewHttp500Error(errors.New("response from search engine has 0 entries"))
 	}

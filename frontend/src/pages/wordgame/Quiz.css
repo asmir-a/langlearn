@@ -28,7 +28,6 @@ article.quiz figure img {
     /*why git actions was not triggered*/
     min-width: 0; /*by default, it is auto which makes the image's initial size the min size of the grid item*/
     min-height: 0;
-    border: 1px solid red;
 }
      
 article.quiz section {

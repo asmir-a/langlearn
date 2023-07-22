@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -107,15 +108,18 @@ func UploadFilesFromWebToS3(dirName string, fileUrls []string) *httperrors.HttpE
 	numberOfWebImages := len(fileUrls)
 	var wg sync.WaitGroup
 	var httpErr *httperrors.HttpError
+	log.Println("starting the goroutines")
 	for taskIndex := 1; taskIndex <= numberOfWebImages; taskIndex++ {
 		wg.Add(1)
 		taskIndex := taskIndex
 		go func() {
 			defer wg.Done()
 			httpErr = uploadFileFromWebToS3(dirName, fileUrls[taskIndex-1], taskIndex)
+			log.Printf("goroutine #%d is done", taskIndex)
 		}()
 	}
 	wg.Wait()
+	log.Println("all goroutines are done")
 	if httpErr != nil {
 		return httperrors.WrapError(httpErr)
 	}
