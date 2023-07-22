@@ -200,6 +200,7 @@ func GetUserWith(sessionKey string) (User, *httperrors.HttpError) {
 }
 
 //todo: this function has a bug in it. it is triggered when the screen was open for some time and session prolly expired. a bit hard to reproduce.
+//scenario is understood now: when the user logs in using another device the session that is stored on the other device gets replaced by a new one. so, when the request for the user is sent with the old cookie, it is not present in the database. this function or the function using this one, should return unauthorized.
 
 //it would be nice if it was possible to wrap error into a new http error
 //getuserwith returns an http500 error. however, this is not really useful

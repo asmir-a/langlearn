@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -87,6 +88,7 @@ func FetchImageUrlsFor(query string) ([]string, *httperrors.HttpError) {
 	if httpErr != nil {
 		return nil, httperrors.WrapError(httpErr)
 	}
+	log.Printf("the response received from imagesearch is: %+v\n", responseItems)
 	if len(responseItems.Items) == 0 {
 		return nil, httperrors.NewHttp500Error(errors.New("response from search engine has 0 entries"))
 	}
