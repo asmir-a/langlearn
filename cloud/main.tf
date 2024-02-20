@@ -23,3 +23,14 @@ resource "aws_instance" "app_server" {
     ami = "ami-0f3a440bbcff3d043"
     instance_type = "t2.micro"
 }
+
+resource "aws_ecr_repository" "ecr_repo" {
+    name = "langlearn"
+    image_tag_mutability = "MUTABLE"
+    image_scanning_configuration {
+        scan_on_push = false
+    }
+    tags = {
+        app = "langlearn"
+    }
+}
