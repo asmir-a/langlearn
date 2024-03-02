@@ -19,18 +19,10 @@ provider "aws" {
     region = "ap-northeast-2"
 }
 
-resource "aws_instance" "app_server" {
-    ami = "ami-0f3a440bbcff3d043"
-    instance_type = "t2.micro"
+module "user-admin" {
+    source = "./modules/user-admin"
 }
 
-resource "aws_ecr_repository" "ecr_repo" {
-    name = "langlearn"
-    image_tag_mutability = "MUTABLE"
-    image_scanning_configuration {
-        scan_on_push = false
-    }
-    tags = {
-        app = "langlearn"
-    }
+module "backend" {
+    source = "./modules/backend"
 }
