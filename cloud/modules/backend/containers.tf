@@ -14,6 +14,8 @@ resource "aws_ecs_cluster" "langlearn_cluster" {
     }
 }
 
+
+
 resource "aws_ecs_task_definition" "langlearn_td" {
     family = "langlearn_td_family"
     requires_compatibilities = ["FARGATE"]
@@ -21,7 +23,7 @@ resource "aws_ecs_task_definition" "langlearn_td" {
     cpu = 256
     memory = 512
     task_role_arn = ""
-    execution_role_arn = ""
+    execution_role_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
     runtime_platform {
         cpu_architecture = "X86_64"
         operating_system_family = "LINUX"
