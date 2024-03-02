@@ -19,10 +19,6 @@ provider "aws" {
     region = "ap-northeast-2"
 }
 
-module "user-admin" {
-    source = "./modules/user-admin"
-}
-
 module "backend" {
     source = "./modules/backend"
 }
