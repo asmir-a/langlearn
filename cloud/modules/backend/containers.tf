@@ -14,7 +14,27 @@ resource "aws_ecs_cluster" "langlearn_cluster" {
     }
 }
 
+data "aws_iam_policy_document" "te_assume_role_policy" {
+    statement {
+      actions = ["sts:AssumeRole"]
+      principals {
+        type = "Service"
+        identifiers = ["ecs-tasks.amazonaws.com"]
+      }
+    }
+}
 
+resource "aws_iam_role" "te_role" {
+    name = "te_role"
+    assume_role_policy = data.aws_iam_policy_document.te_assume_role_policy.json
+}
+
+
+resource "aws_iam_policy_attachment" "te_policy_attachment" {
+    name = "te_policy_attachment"
+    roles = [aws_iam_role.te_role.name]
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
 
 resource "aws_ecs_task_definition" "langlearn_td" {
     family = "langlearn_td_family"
@@ -22,7 +42,7 @@ resource "aws_ecs_task_definition" "langlearn_td" {
     network_mode = "awsvpc"
     cpu = 256
     memory = 512
-    execution_role_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+    execution_role_arn = aws_iam_role.te_role.arn
     runtime_platform {
         cpu_architecture = "X86_64"
         operating_system_family = "LINUX"
@@ -103,9 +123,7 @@ resource "aws_ecs_service" "langlearn_backend" {
     task_definition = aws_ecs_task_definition.langlearn_td.arn
     desired_count = 1
     force_new_deployment = true
-    health_check_grace_period_seconds = 30
     launch_type = "FARGATE"
-    wait_for_steady_state = true
     network_configuration {
       subnets = [aws_subnet.subnet_private_one.id, aws_subnet.subnet_private_two.id]
       security_groups = [aws_security_group.allow_web_traffic.id]
