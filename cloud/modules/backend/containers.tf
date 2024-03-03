@@ -22,7 +22,6 @@ resource "aws_ecs_task_definition" "langlearn_td" {
     network_mode = "awsvpc"
     cpu = 256
     memory = 512
-    task_role_arn = ""
     execution_role_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
     runtime_platform {
         cpu_architecture = "X86_64"
